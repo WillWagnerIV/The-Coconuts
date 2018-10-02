@@ -1,1 +1,5 @@
 Temp Placeholder
+
+Because this is Agile Development, we expect there to be minimal documentation at the start of the project.
+
+This is a placeholder file to establish and maintain the Folder Structure.
