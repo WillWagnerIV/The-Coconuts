@@ -1,0 +1,50 @@
+IST303 Fall 2018
+
+Project requirements
+
+In this project you are required to implement a GUI application in Python 3. The GUI app interfaces the user to an underlying data store. The project should be completed using the agile principles articulated in Pilone & Miles. Make sure to meet with your instructor as regularly as you require to ensure that the project is scoped appropriately – neither too narrowly nor too widely.
+
+Beyond those requirements, you and your team are free to choose your own domains to create a solution project for.
+
+There are four parts to the project, A, B, C, and D.
+
+Part A
+
+    Meet with other members of your assigned team. I will have created the teams with the goal to optimize the mix among coding, GUI, and database skills.
+    Come up with a concept for your application.
+    Create an initial set of project requirements expressed as user stories. Make sure to identify all the relevant project stakeholders.
+    The user stories must have estimates of completion times.
+    Meet with the instructor to discuss the concept and initial set of user stories.
+
+Due: Githup repository URL for your project. There should be a README in the repo with relevant documentation i.e. team members, stakeholders, requirements etc.
+
+Part B
+
+    Decompose your user stories into tasks.
+    Outline what features will be in Milestone 1.0 of your project.
+    Build the iterations (at most 2) that will compose your Milestone 1.0. Record the total days of work and the time it will take for your team to complete that work.
+    Make sure you have dealt with velocity before breaking into iterations.
+    Allocate tasks to each team member and record the allocation.
+    Create a burn down chart for monitoring your team’s progress.
+    Include evidence that you are meeting for periodic stand up meetings with your teammates, ideally at least twice a week.
+    Ensure that your development and testing environment is set up. Be sure to have some working functional (however rudimentary) and test code in your repository.
+
+Due: Githup repository URL for your project. Revise your README to reflect your answers to questions posed in Part B.
+
+Part C
+
+    Present to your class Milestone 1.0 of your project.
+    You must present working code and explain what it does and how it fulfils the user stories.
+    Show and explain how the code was tested.
+    Explain what remains to be done to accomplish Milestone 2.0.
+
+Due: Presentation to class, including demo of the project.
+
+Part D
+
+    Present to your class Milestone 2.0 of your project.
+    You must present working code and explain what it does and how it fulfils the user stories.
+    Show and explain how the code was tested.
+    Include in your README, the three most important things you learned about software development in your project.
+
+Due: Presentation to class, including demo of the project.
