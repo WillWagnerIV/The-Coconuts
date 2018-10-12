@@ -88,3 +88,10 @@ iv.	Specific Trophy Stats
 v.	Basic Info Above
 b.	Importance 20
 c.	Time required: 3 days
+
+
+Use Case:
+https://github.com/WillWagnerIV/The-Coconuts/blob/master/Docs/Agile%20Docs/Unified%20Tracker%20Use%20Case.png
+
+UML Classes:
+https://github.com/WillWagnerIV/The-Coconuts/blob/master/Docs/Agile%20Docs/Unified%20Tracking%20Classes.png
