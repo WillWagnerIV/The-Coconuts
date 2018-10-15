@@ -15,7 +15,7 @@ class UserCon():
         print('\n')
         print('Connecting to DB \n')
         self.cnx = mysql.connect(user='program_user', password='Pr0gpass',
-                                 host='127.0.0.1',
+                                 host='localhost',
                                  database='upts_s1')
         self.cursor = self.cnx.cursor()
 
@@ -143,18 +143,6 @@ def LoginMenu():
             print()
 
 
-#  Main Menu
-def mainMenu():
-    print()
-    print('       ###   Main Menu   ###')
-    print()
-    print(' 1 - Players Menu')
-    print(' 2 - Games Menu')
-    print(' 3 - Reports Menu')
-    print(' 0 - Quit')
-    print()
-
-
 #  Player Menu
 def PlayerMenu(aUser):
     thisConn = PlayerCon()
@@ -218,10 +206,17 @@ def MainLoop():
 
         # Main 3 Choices
 
-        mainMenu()
+        print()
+        print('       ###   Main Menu   ###')
+        print()
+        print(' 1 - Players Menu')
+        print(' 2 - Games Menu')
+        print(' 3 - Reports Menu')
+        print(' 0 - Quit')
+        print()
         menuChoice = input(' Selection: ')
 
-        if menuChoice in ("1", "2", "3"):
+        if menuChoice in ("1", "2", "3", "4"):
             print()
         if menuChoice == '0':
             mainLooping = False
