@@ -1,6 +1,9 @@
 import requests
 import json
 import mysql.connector as mysql
+import sqlite3
+import pytest
+import datetime
 
 
 class UserCon():
@@ -15,7 +18,7 @@ class UserCon():
         print('\n')
         print('Connecting to DB \n')
         self.cnx = mysql.connect(user='program_user', password='Pr0gpass',
-                                 host='localhost',
+                                 host='',
                                  database='upts_s1')
         self.cursor = self.cnx.cursor()
 
@@ -237,6 +240,48 @@ def MainLoop():
 
 
 MainLoop()
+
+
+@pytest.mark.xfail
+def test_login():
+    UserCon.OpenDB(UserCon)
+    aUser = "asdf"
+    aPass = "kjhkljh"
+    assert UserCon.SignIn(UserCon, aUser, aPass) == "asdf"
+    UserCon.CloseDB(UserCon)
+
+
+@pytest.mark.xfail
+def test_new_user():
+    un = "TestUser"+str(datetime.datetime)
+    pw = "kjhkljh"
+    UserCon.OpenDB(UserCon)
+    assert UserCon.AddUser(UserCon, un, pw) == UserCon.cursor.lastrowid
+    self.CloseDB()
+
+
+@pytest.mark.xfail
+def test_list_users():
+    assert 1 == 5
+
+
+@pytest.mark.xfail
+def test_list_players():
+    assert 1 == 5
+
+
+@pytest.mark.xfail
+def test_add_player():
+    assert 1 == 5
+
 # print('\n\n')
 # print("{}, {} was hired on {:%d %b %Y}".format(
 #     last_name, first_name, hire_date))
+
+
+# conn.execute('''CREATE TABLE COMPANY
+#          (ID INT PRIMARY KEY     NOT NULL,
+#          NAME           TEXT    NOT NULL,
+#          AGE            INT     NOT NULL,
+#          ADDRESS        CHAR(50),
+#          SALARY         REAL);''')
