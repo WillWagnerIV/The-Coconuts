@@ -1,93 +1,41 @@
+"""
+# Never do this -- insecure!
+symbol = 'RHAT'
+c.execute("SELECT * FROM stocks WHERE symbol = '%s'" % symbol)
+
+# Do this instead
+t = ('RHAT',)
+c.execute('SELECT * FROM stocks WHERE symbol=?', t)
+print(c.fetchone())
+
+# Larger example that inserts many records at a time
+purchases = [('2006-03-28', 'BUY', 'IBM', 1000, 45.00),
+             ('2006-04-05', 'BUY', 'MSFT', 1000, 72.00),
+             ('2006-04-06', 'SELL', 'IBM', 500, 53.00),
+            ]
+c.executemany('INSERT INTO stocks VALUES (?,?,?,?,?)', purchases)
+"""
+
+
 import requests
 import json
-import mysql.connector as mysql
-from mysql.connector import errorcode
 import sqlite3
 import pytest
 import datetime
 
 
-
-db_master = 'upts_s1'
-db_host = '127.0.0.1'
-db_user='prog_user'
-db_password='pr0gpass'
+sqlite_master = 'upts_main.db'
 table_name = ""
 
-
-# NOT WORKING - Included for Reference
-def create_database(cursor):
-    try:
-        cursor.execute(
-            "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(DB_NAME))
-    except mysql.connector.Error as err:
-        print("Failed creating database: {}".format(err))
-        exit(1)
-
-    try:
-        cursor.execute("USE {}".format(DB_NAME))
-    except mysql.connector.Error as err:
-        print("Database {} does not exists.".format(DB_NAME))
-        if err.errno == errorcode.ER_BAD_DB_ERROR:
-            create_database(cursor)
-            print("Database {} created successfully.".format(DB_NAME))
-            cnx.database = DB_NAME
-        else:
-            print(err)
-            exit(1)
+def uptsConn():
+    conn = sqlite3.connect(sqlite_master)
+    conStatus = conn.Error 
+    print ("Connected = " + str(conStatus))
+    return conn, conStatus
 
 
-# Open Database Connection and Print Confirmation
-# Report Error then Close Connection
-def openDB_test():
-    
-    try:
-        cnx = mysql.connect(user=db_user, password=db_password,
-                                    host=db_host,
-                                    database=db_master)
-        print ('Connection Opened')
-    except mysql.Error as err:
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database does not exist")
-        else:
-            print(err)
-    else:
-        cnx.close()
-
-
-# Open Database Connection or Report Error - Does not Close Connection
-def OpenDB():
-
-    try:
-        cnx = mysql.connect(user=db_user, password=db_password,
-                                    host=db_host,
-                                    database=db_master)
-        print('Connection Opened')
-        return cnx
-    except mysql.Error as err:
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database does not exist")
-        else:
-            print(err)
-            return err
-
-
-# Close Database Connection
-def CloseDB(cnx):
-    c = cnx.cursor()
-    c.close()
-    cnx.close()
-    print('Connection Closed')
-
-
-
-# Create a Table - Pass table_columns as a list
-def createTable(cnx,table_name,table_columns):
-    c = cnx.cursor()
+def createTable(conn,table_name,table_columns):
+    c = conn.cursor()
     colCount = 0
     try:
         # Create table
@@ -102,99 +50,167 @@ def createTable(cnx,table_name,table_columns):
         print ('sql statement: ' + str(sqlStatement))
 
         c.execute(sqlStatement)
-        cnx.commit()
+        conn.commit()
         print('created ' + table_name + ' table')
 
     except Exception as identifier:
         print(str(identifier))
-        # dropTable(cnx, 'users')
+        # dropTable(conn, 'users')
 
 
-# users table connections
+def dropTable(conn, table_name):
+
+    c = conn.cursor()
+
+    c.execute('''DROP TABLE users''')
+    conn.commit()
+    print('Table users dropped')
+
+
+def commit_close(conn):
+
+    # Save (commit) the changes
+    conn.commit()
+    # Close the connection
+    conn.close()
+
+
+conn, conStatus = uptsConn()
+c = conn.cursor()
+
+# Check if the table exists
+if c.execute("""select count(*) from sqlite_master where type='table' and name='users'""") == 1:
+    dropTable(conn, 'users')
+
+
+createTable(conn, 'users', ['username','password'])
+
+# Insert a row of data
+c.execute("INSERT INTO users VALUES ('will','willtest')")
+
+
+
+
+
+
+
+c.execute("SELECT * FROM users")
+print(c.fetchall())
+
+
+
+commit_close(conn)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class UserCon():
-    
+
+    cnx = ""
+    cursor = ""
+
     def __init__(self):
         print('\n')
 
-    def GetUsers():
+    def OpenDB(self):
+        print('\n')
+        print('Connecting to DB \n')
+        self.cnx = mysql.connect(user='program_user', password='Pr0gpass',
+                                 host='134.173.236.104',
+                                 database='coco_upts')
+        self.cursor = self.cnx.cursor()
 
-        cnx = OpenDB()
-        cursor = cnx.cursor()
+    def CloseDB(self):
+        self.cursor.close()
+        self.cnx.close()
+        print()
+        print('Connection Closed')
+
+    def GetUsers(self):
+
+        self.OpenDB()
         query = ("SELECT * FROM users")
-        cursor.execute(query)
-        for (username) in cursor:
+        self.cursor.execute(query)
+        for (username) in self.cursor:
             print("{}".format(username))
-        CloseDB(cnx)
+        self.CloseDB()
 
-    def AddUser( un, pw):
+    def AddUser(self, un, pw):
 
-        cnx = OpenDB()
-        cursor = cnx.cursor()
+        self.OpenDB()
         sql = "INSERT INTO users (username, password) VALUES (%s, %s)"
         val = (un, pw)
-        cursor.execute(sql, val)
+        self.cursor.execute(sql, val)
 
-        cnx.commit()
+        self.cnx.commit()
 
-        print("1 record inserted, ID:", cursor.lastrowid)
-        CloseDB(cnx)
+        print("1 record inserted, ID:", self.cursor.lastrowid)
+        self.CloseDB()
 
-    def SignIn(un, pw):
+    def SignIn(self, un, pw):
+        print('Need to add code to validate')
 
-        print('Trying to Validate')
-        cnx = OpenDB()
-        cursor = cnx.cursor()
-        sql = 'SELECT * FROM users WHERE username = "' + un + '"'
-        # print (sql)
-        cursor.execute(sql)
-        for response in cursor:
-            if response[2] == pw:
-                CloseDB(cnx)
-                return "Valid"
-            else:
-                CloseDB(cnx)
-                return "Invalid Username or Password"
-        
 
 class PlayerCon():
 
+    cnx = ""
+    cursor = ""
+
     def __init__(self):
         print('\n')
 
+    def OpenDB(self):
+        print('\n')
+        print('Connecting to DB \n')
+        self.cnx = mysql.connect(user='program_user', password='Pr0gpass',
+                                 host='134.173.236.104',
+                                 database='coco_upts')
+        self.cursor = self.cnx.cursor()
 
-    def GetPlayers(un):
+    def CloseDB(self):
+        self.cursor.close()
+        self.cnx.close()
+        print()
+        print('Connection Closed')
 
-        cnx = OpenDB()
-        cursor = cnx.cursor()
+    def GetPlayers(self, un):
+
+        self.OpenDB()
         sql = "SELECT * FROM players WHERE username = '" + un + "'"
         val = un
-        cursor.execute(sql)
-        for (player_name) in cursor:
+        self.cursor.execute(sql)
+        for (player_name) in self.cursor:
             print("{}".format(player_name))
-        CloseDB(cnx)
+        self.CloseDB()
 
+    def AddPlayer(self, un, pn):
 
-    def AddPlayer(un, pn):
-
-        cnx = OpenDB()
-        cursor = cnx.cursor()
+        self.OpenDB()
         sql = "INSERT INTO players (username, player_name) VALUES (%s, %s)"
         val = (un, pn)
-        cursor.execute(sql, val)
-        cnx.commit()
+        self.cursor.execute(sql, val)
+        self.cnx.commit()
 
-        print("1 record inserted, ID:", cursor.lastrowid)
-        CloseDB(cnx)
-
-
+        print("1 record inserted, ID:", self.cursor.lastrowid)
+        self.CloseDB()
 
 
 #  Menus
 #  Login Menu
 def LoginMenu():
+    thisConn = UserCon()
     loggingIn = True
-    cnx = OpenDB()
-    cursor = cnx.cursor()
 
     while (loggingIn):
         print()
@@ -214,30 +230,24 @@ def LoginMenu():
         if menuChoice == '0':
             loggingIn = False
             return "Quit"
+            break
 
         elif menuChoice == '1':
             aUser, aPass = input(
                 "Enter Username and Password (Username, Password): ").split(',')
-            userVal = UserCon.SignIn(aUser, aPass)
-            if userVal == None:
-                CloseDB(cnx)
-            elif userVal == "Valid":
-                loggingIn = False
-                return aUser
-            else:
-                print (userVal)
-            
+            thisConn.SignIn(aUser, aPass)
+            return aUser
 
         elif menuChoice == '2':
             aUser, aPass = input(
                 "Enter new Username and Password (Username, Password): ").split(',')
-            UserCon.AddUser(aUser, aPass)
+            thisConn.AddUser(aUser, aPass)
 
         elif menuChoice == '3':
-            UserCon.UserRecover()
+            UserRecover()
 
         elif menuChoice == '4':
-            UserCon.GetUsers()
+            thisConn.GetUsers()
 
         else:
             print()
@@ -247,6 +257,7 @@ def LoginMenu():
 
 #  Player Menu
 def PlayerMenu(aUser):
+    thisConn = PlayerCon()
     PlayerMenuing = True
 
     while (PlayerMenuing):
@@ -270,12 +281,12 @@ def PlayerMenu(aUser):
             break
 
         elif menuChoice == '1':
-            PlayerCon.GetPlayers(aUser)
+            thisConn.GetPlayers(aUser)
 
         elif menuChoice == '2':
             aName = input(
                 "Enter new Player Name: ")
-            PlayerCon.AddPlayer(aUser, aName)
+            thisConn.AddPlayer(aUser, aName)
 
         elif menuChoice == '3':
             print('remove player')
@@ -300,8 +311,7 @@ def MainLoop():
         # Call the LoginMenu
         if thisUser == "":
             thisUser = LoginMenu()
-            print ()
-            print("User: ",thisUser)
+            print(thisUser)
             if thisUser == 'Quit':
                 mainLooping = False
                 break
@@ -338,7 +348,7 @@ def MainLoop():
             print()
 
 
-MainLoop()
+# MainLoop()
 
 
 @pytest.mark.xfail
@@ -378,7 +388,7 @@ def test_add_player():
 #     last_name, first_name, hire_date))
 
 
-# cnx.execute('''CREATE TABLE COMPANY
+# conn.execute('''CREATE TABLE COMPANY
 #          (ID INT PRIMARY KEY     NOT NULL,
 #          NAME           TEXT    NOT NULL,
 #          AGE            INT     NOT NULL,
