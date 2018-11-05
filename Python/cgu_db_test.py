@@ -5,6 +5,10 @@ from mysql.connector import errorcode
 
 DB_NAME = 'employees'
 
+cnx = mysql.connector.connect(user='prog_user', password='Pr0gpass',
+                                 host='134.173.236.104')
+cursor = cnx.cursor()
+
 TABLES = {}
 TABLES['employees'] = (
     "CREATE TABLE `employees` ("
@@ -76,9 +80,7 @@ TABLES['titles'] = (
     ") ENGINE=InnoDB")
     
 
-cnx = mysql.connector.connect(user='prog_user', password='Pr0gpass',
-                                 host='134.173.236.104')
-cursor = cnx.cursor()
+
 
 
 def create_database(cursor):
