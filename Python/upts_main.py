@@ -10,6 +10,7 @@ import pandas as pd
 from pandas.io.json import json_normalize
 import numpy as np
 import pprint
+import sys
 
 
 # Database Connection Variables
@@ -26,19 +27,19 @@ db_table = ""
 def create_database(cursor):
     try:
         cursor.execute(
-            "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(DB_NAME))
+            "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(db_master))
     except mysql.connector.Error as err:
         print("Failed creating database: {}".format(err))
         exit(1)
 
     try:
-        cursor.execute("USE {}".format(DB_NAME))
+        cursor.execute("USE {}".format(db_master))
     except mysql.connector.Error as err:
-        print("Database {} does not exists.".format(DB_NAME))
+        print("Database {} does not exists.".format(db_master))
         if err.errno == errorcode.ER_BAD_DB_ERROR:
             create_database(cursor)
-            print("Database {} created successfully.".format(DB_NAME))
-            cnx.database = DB_NAME
+            print("Database {} created successfully.".format(db_master))
+            cnx.database = db_master
         else:
             print(err)
             exit(1)
@@ -159,6 +160,10 @@ class UserCon():
             else:
                 CloseDB(cnx)
                 return "Invalid Username or Password"
+
+    def UserRecover():
+
+        print('This is where the screens to assist with credentials would go.')
 
 
 class PlayerCon():
@@ -357,22 +362,35 @@ def LoginMenu():
             return "Quit"
 
         elif menuChoice == '1':
-            aUser, aPass = input(
-                "Enter Username and Password (Username, Password): ").split(',')
-            userVal = UserCon.SignIn(aUser, aPass)
-            if userVal == None:
-                CloseDB(cnx)
-            elif userVal == "Valid":
-                loggingIn = False
-                return aUser
-            else:
-                print (userVal)
+            try:
+                aUser, aPass = input(
+                    "Enter Username and Password (Username, Password): ").split(',')
+            except:
+                print("Oops!",sys.exc_info()[0],"occured.")
+
+            try:
+                userVal = UserCon.SignIn(aUser, aPass)
+                if userVal == None:
+                    CloseDB(cnx)
+                elif userVal == "Valid":
+                    loggingIn = False
+                    return aUser
+                else:
+                    print (userVal)
+            except:
+                print("Oops!",sys.exc_info()[0],"occured.")
             
 
         elif menuChoice == '2':
-            aUser, aPass = input(
-                "Enter new Username and Password (Username, Password): ").split(',')
-            UserCon.AddUser(aUser, aPass)
+            try:
+                print ('PASSWORD IS NOT ENCRYPTED OR SECURE!')
+                print ('PASSWORD WILL BE VISIBLE!')
+                print ("ONLY USE A TEMPORARY TEST PASSWORD YOU DON'T CARE IF ANYONE SEES!")
+                aUser, aPass = input("Enter new Username and Password (Username, Password): ").split(',')
+                UserCon.AddUser(aUser, aPass)
+
+            except:
+                print("Oops!",sys.exc_info()[0],"occured.")
 
         elif menuChoice == '3':
             UserCon.UserRecover()
@@ -447,6 +465,7 @@ def AddTestGame():
     ]
     game_ach = [
         {"Com L1 Normal" : {"Description" : "Completed Level One on Normal Difficulty" }},
+        {"Com L1 Quick" : {"Description" : "Completed Level One Normal Difficulty in less than 2 minutes" }},
         {"Com L2 Hard" : {"Description" : "Completed Level Two on Hard Difficulty" }}
     ]
     game_items = [
@@ -462,10 +481,10 @@ def AddTestGame():
         'game_ach' : game_ach,
         'game_items' : game_items
     }
-    print (testGame)
-    print (testGame['game_name'])
-    print (testGame['game_ach'])
-    print (testGame['game_trophies'])
+    # print (testGame)
+    # print (testGame['game_name'])
+    # print (testGame['game_ach'])
+    # print (testGame['game_trophies'])
     # dataframe = json_funcs.make_Pandas (testGame)
     # print (dataframe)
     # dataframe.to_dict(orient = "split")
