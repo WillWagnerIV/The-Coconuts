@@ -1,28 +1,21 @@
 import requests
-from io import StringIO
 import json
 import mysql.connector as mysql
 from mysql.connector import errorcode
 import sqlite3
 import pytest
 import datetime
-import pandas as pd
-from pandas.io.json import json_normalize
-import numpy as np
-import pprint
 
 
-# Database Connection Variables
+
 db_master = 'upts_s1'
-db_host = '134.173.236.104'
+db_host = '127.0.0.1'
 db_user='prog_user'
-db_password='Pr0gpass'
-db_table = ""
+db_password='pr0gpass'
+table_name = ""
 
 
-# ----------  START DATABASE FUNCTIONS
-
-# Create Database - NOT WORKING YET - Included for Reference
+# NOT WORKING - Included for Reference
 def create_database(cursor):
     try:
         cursor.execute(
@@ -46,7 +39,8 @@ def create_database(cursor):
 
 # Open Database Connection and Print Confirmation
 # Report Error then Close Connection
-def open_test_close():
+def openDB_test():
+    
     try:
         cnx = mysql.connect(user=db_user, password=db_password,
                                     host=db_host,
@@ -61,11 +55,11 @@ def open_test_close():
             print(err)
     else:
         cnx.close()
-        print ('Connection Closed')
 
 
 # Open Database Connection or Report Error - Does not Close Connection
 def OpenDB():
+
     try:
         cnx = mysql.connect(user=db_user, password=db_password,
                                     host=db_host,
@@ -89,16 +83,16 @@ def CloseDB(cnx):
     cnx.close()
     print('Connection Closed')
 
-# ----------  START DATABASE TABLE FUNCTIONS
+
 
 # Create a Table - Pass table_columns as a list
-def createTable(cnx,db_table,table_columns):
+def createTable(cnx,table_name,table_columns):
     c = cnx.cursor()
     colCount = 0
     try:
         # Create table
         print (table_columns)
-        sqlStatement = 'CREATE TABLE '+ db_table + ' ('
+        sqlStatement = 'CREATE TABLE '+ table_name + ' ('
         for col_Name in table_columns:
             sqlStatement += col_Name
             if colCount < len (table_columns) - 1:
@@ -109,15 +103,15 @@ def createTable(cnx,db_table,table_columns):
 
         c.execute(sqlStatement)
         cnx.commit()
-        print('created ' + db_table + ' table')
+        print('created ' + table_name + ' table')
 
     except Exception as identifier:
         print(str(identifier))
         # dropTable(cnx, 'users')
 
 
-# ----------  START TABLECONS
 
+# users table connections
 class UserCon():
     
     def __init__(self):
@@ -207,54 +201,40 @@ class PlayerCon():
 
 class GameCon():
 
-    # Class Variables
-    # none
-
     def __init__(self):
         print('\n')
 
     def GetGames(un):
 
-        games = []
+        players = []
         cnx = OpenDB()
         cursor = cnx.cursor()
-        sql = "SELECT * FROM games WHERE game_name = '" + un + "'"
+        sql = "SELECT * FROM games WHERE username = '" + un + "'"
         val = un
         cursor.execute(sql)
-        for (game_name) in cursor:
-            print("{}".format(game_name))
-            games.append(game_name)
+        for (player_name) in cursor:
+            print("{}".format(player_name))
+            players.append(player_name)
         CloseDB(cnx)
-        return games
+        return players
 
-    def AddGame(game_name, game_currency, game_trophies, game_ach, game_items):
+    def AddGame(un, pn):
 
         cnx = OpenDB()
         cursor = cnx.cursor()
-        sql = "INSERT INTO games (game_name, game_currency,game_trophies, game_ach,game_items) VALUES (%s, %s, %s, %s, %s )"
-        val = (game_name, game_currency, game_trophies, game_ach, game_items)
+        sql = "INSERT INTO players (username, player_name) VALUES (%s, %s)"
+        val = (un, pn)
         cursor.execute(sql, val)
         cnx.commit()
         print("1 record inserted, ID:", cursor.lastrowid)
         CloseDB(cnx)
 
-    def AddGame_json(game_name, game_currency, game_trophies, game_ach, game_items):
+    def removeGame(player):
 
         cnx = OpenDB()
         cursor = cnx.cursor()
-        sql = "INSERT INTO games (game_name, game_currency,game_trophies, game_ach,game_items) VALUES (%s, %s, %s, %s, %s )"
-        val = (game_name, game_currency, game_trophies, game_ach, game_items)
-        cursor.execute(sql, val)
-        cnx.commit()
-        print("1 record inserted, ID:", cursor.lastrowid)
-        CloseDB(cnx)
-
-    def removeGame(game_name):
-
-        cnx = OpenDB()
-        cursor = cnx.cursor()
-        sql = "DELETE FROM `upts_s1`.`games` WHERE (`idgame` = '"
-        sql += str(game_name[0]) + "')"
+        sql = "DELETE FROM `upts_s1`.`players` WHERE (`idplayers` = '"
+        sql += str(player[0]) + "')"
         print (sql)
         cursor.execute(sql)
         cnx.commit()
@@ -262,75 +242,9 @@ class GameCon():
         CloseDB(cnx)
 
 
-# ----------  END DATABASE FUNCTIONS
-
-# ----------  START JSON FUNCTIONS
-class json_funcs:
-    def __init__(self):
-        print('\n')
-
-    def make_json_dict(url):
-        req = requests.get(url)
-        json_dict = req.json()
-        return json_dict
-
-    def make_Pandas(datadict):
-        dataframe = pd.DataFrame(datadict)
-        return dataframe
-
-    def generic_save(data):
-        with open('temp.json', 'w') as outfile:
-            json.dumps(data)
-
-    def generic_load():
-            json_data = json.loads('temp.json')
-            print(json_data)
-
-    def save_json_pd(pd_dataframe):
-        with open('temp.json', 'w') as f:
-            f.write(pd_dataframe.to_json(orient='columns'))
-
-    def load_json_pd():
-        dataframe = pd.read_json('temp.json', orient='columns')
-        print(dataframe)
-        return dataframe
-
-    def test_json_sequence():
-        temp_data = PlayerCon.GetPlayers('asdf')
-        print (temp_data)
-        dataframe = json_funcs.make_Pandas(temp_data)
-        print ('Dataframe:')
-        print (dataframe)
-        json_funcs.save_json_pd(dataframe)
-        json_funcs.load_json_pd()
-
-    def test_generic_sequence():
-        temp_data = PlayerCon.GetPlayers('asdf')
-        print (temp_data)
-        json_funcs.generic_save(temp_data)
-        loaded_data = json_funcs.generic_load()
-        print ('Loaded: \n')
-        print (loaded_data)
-        loaded_data = json_funcs.make_Pandas(loaded_data)
-        print (loaded_data)
 
 
-
-
-def save_json_NG(json_filename):
-    pd.to_json(orient='table'), {"schema": {"fields": [{"name": "index", "type": "string"},
-                        {"name": "Player Key", "type": "int"},
-                        {"name": "Player Name", "type": "string"},
-                        {"name": "col 1", "type": "string"},
-                        {"name": "col 2", "type": "string"},
-                        {"name": "User", "type": "string"}],
-                "primaryKey": "index",
-                "pandas_version": "0.20.0"},
-        "data": [{"index": "row 1", "Player Key": "36","Player Name": "A Player Name","col 1": "a", "col 2": "b", "User": "A User Name"}]}
-
-# ----------  END JSON FUNCTIONS
-
-# ----------  START MENUS
+#  Menus
 #  Login Menu
 def LoginMenu():
     loggingIn = True
@@ -425,8 +339,8 @@ def PlayerMenu(aUser):
             for player in players_list:
                 if pk == player[0]:
                     print ('Are you sure you want to remove ' + str(player))
-                    double_check = input ('Enter y to Confirm Delete - There is no reversing this action!')
-                    if double_check == 'y':
+                    double_check = input ('Enter 0 to Confirm Delete - There is no reversing this action!')
+                    if double_check == '0':
                         PlayerCon.removePlayer (player)
 
         elif menuChoice == '4':                             # Edit a Player
@@ -437,46 +351,6 @@ def PlayerMenu(aUser):
             print('Please choose one of the options above.')
             print()
 
-def AddTestGame():
-        
-    game_name = "Test Game"
-    game_currency = "Test Currency"
-    game_trophies = [
-        {"Test Trophy One" : {"Description" : "An awesome test trophy" }},
-        {"Test Trophy Two" : {"Description" : "An second awesome test trophy" }}
-    ]
-    game_ach = [
-        {"Com L1 Normal" : {"Description" : "Completed Level One on Normal Difficulty" }},
-        {"Com L2 Hard" : {"Description" : "Completed Level Two on Hard Difficulty" }}
-    ]
-    game_items = [
-        {"jelly_gun" : [{"Description" : "Jelly Gun" }, {"Cost" : 500 }]},
-        {"mar_gun" : [{"Description" : "Marshmellow Gun" }, {"Cost" : 750 }]},
-        {"mar_cannon" : [{"Description" : "Marshmellow Cannon" }, {"Cost" : 1000 }]}
-    ]
-
-    testGame = {
-        'game_name' : game_name,
-        'game_currency' : game_currency,
-        'game_trophies' : game_trophies,
-        'game_ach' : game_ach,
-        'game_items' : game_items
-    }
-    print (testGame)
-    print (testGame['game_name'])
-    print (testGame['game_ach'])
-    print (testGame['game_trophies'])
-    # dataframe = json_funcs.make_Pandas (testGame)
-    # print (dataframe)
-    # dataframe.to_dict(orient = "split")
-
-
-
-
-
-    # GameCon.AddGame(game_name, game_currency, game_trophies, game_ach, game_items)
-
-AddTestGame()
 
 #  Main Loop
 def MainLoop():
@@ -520,120 +394,55 @@ def MainLoop():
             UserCon.GetUsers()
         elif menuChoice == '4':
             PlayerCon.ListPlayers()
-            
         else:
             print()
             print('Please choose one of the options above.')
             print()
 
 
-
 MainLoop()
 
 
-# ---------  END MAIN
+@pytest.mark.xfail
+def test_login():
+    OpenDB(UserCon)
+    aUser = "asdf"
+    aPass = "kjhkljh"
+    assert UserCon.SignIn(UserCon, aUser, aPass) == "asdf"
+    CloseDB(UserCon)
 
 
+@pytest.mark.xfail
+def test_new_user():
+    un = "TestUser"+str(datetime.datetime)
+    pw = "kjhkljh"
+    OpenDB(UserCon)
+    assert UserCon.AddUser(UserCon, un, pw) == UserCon.cursor.lastrowid
+    self.CloseDB()
 
 
+@pytest.mark.xfail
+def test_list_users():
+    assert 1 == 5
 
 
-#  Test Functions
-class TestFuncts():
-
-    @pytest.mark.xfail
-    def test_login():
-        OpenDB(UserCon)
-        aUser = "asdf"
-        aPass = "kjhkljh"
-        assert UserCon.SignIn(UserCon, aUser, aPass) == "asdf"
-        CloseDB(UserCon)
+@pytest.mark.xfail
+def test_list_players():
+    assert 1 == 5
 
 
-    @pytest.mark.xfail
-    def test_new_user():
-        un = "TestUser"+str(datetime.datetime)
-        pw = "kjhkljh"
-        OpenDB(UserCon)
-        assert UserCon.AddUser(UserCon, un, pw) == UserCon.cursor.lastrowid
-        self.CloseDB()
+@pytest.mark.xfail
+def test_add_player():
+    assert 1 == 5
+
+# print('\n\n')
+# print("{}, {} was hired on {:%d %b %Y}".format(
+#     last_name, first_name, hire_date))
 
 
-    @pytest.mark.xfail
-    def test_list_users():
-        assert 1 == 5
-
-
-    @pytest.mark.xfail
-    def test_list_players():
-        assert 1 == 5
-
-
-    @pytest.mark.xfail
-    def test_add_player():
-        assert 1 == 5
-
-    # print('\n\n')
-    # print("{}, {} was hired on {:%d %b %Y}".format(
-    #     last_name, first_name, hire_date))
-
-
-    # cnx.execute('''CREATE TABLE COMPANY
-    #          (ID INT PRIMARY KEY     NOT NULL,
-    #          NAME           TEXT    NOT NULL,
-    #          AGE            INT     NOT NULL,
-    #          ADDRESS        CHAR(50),
-    #          SALARY         REAL);''')
-
-
-
-
-
-
-
-'''
-In [246]: data = [{'state': 'Florida',
-             'shortname': 'FL',
-             'info': {
-                  'governor': 'Rick Scott'
-             },
-             'counties': [{'name': 'Dade', 'population': 12345},
-                         {'name': 'Broward', 'population': 40000},
-                         {'name': 'Palm Beach', 'population': 60000}]},
-            {'state': 'Ohio',
-             'shortname': 'OH',
-             'info': {
-                  'governor': 'John Kasich'
-             },
-             'counties': [{'name': 'Summit', 'population': 1234},
-                          {'name': 'Cuyahoga', 'population': 1337}]}]
-   
-
-In [247]: json_normalize(data, 'counties', ['state', 'shortname', ['info', 'governor']])
-'''
-
-'''
-data = [
-    {
-    'game': 'Eve',
-    'info': 
-    {
-        'currency': 'ISK'
-    },
-    'items': [{'name': 'Frigate', 'cost': 1000},
-                {'name': 'Cruiser', 'cost': 40000},
-                {'name': 'Destroyer', 'cost': 60000}]},
-    {
-    'game': 'Crushy',
-    'info': 
-    {
-        'currency': 'Crushy Bucks'
-    },
-    'items': [{'name': 'Bomb', 'cost': 1000},
-                {'name': 'Gun', 'cost': 750}]}]
-   
-
-json_normalize(data, 'items', ['game', ['info', 'currency']])
-
-json_normalize(data, ['game', ['info', 'currency']])
-'''
+# cnx.execute('''CREATE TABLE COMPANY
+#          (ID INT PRIMARY KEY     NOT NULL,
+#          NAME           TEXT    NOT NULL,
+#          AGE            INT     NOT NULL,
+#          ADDRESS        CHAR(50),
+#          SALARY         REAL);''')
