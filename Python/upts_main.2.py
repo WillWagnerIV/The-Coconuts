@@ -38,12 +38,6 @@ class upts_game():
         self.total_game_count += 1
         self.allGames.append(self.game_name)
 
-        self.sql = ""
-        self.val = ""
-        self.cnx = ""
-        self.csr = ""
-        self.games_idgames = ""
-
     def convert_class_to_dict(self):
         game_name = self.game_name
         game_notes = self.game_notes
@@ -83,122 +77,8 @@ class upts_game():
         print(dataframe)
         return dataframe
 
-    # Save each property to their respective databases
-    def save_to_db(self):
-        
-        def db_con (func):
-            def inner (*args, **kwargs):
-                self.cnx = upts_db.OpenDB()
-                self.csr = self.cnx.cursor()
-
-                try:
-                    func (*args, **kwargs)
-                    
-                except Exception as err:
-                    print("Failed inserting record: {}".format(err))
-                
-                
-                upts_db.CloseDB(self.cnx)
-
-            return inner
-
-        # Game Name
-        def name_to_db(self):
-            cnx = upts_db.OpenDB()
-            csr = cnx.cursor()
-            try:
-                self.sql = "INSERT INTO `upts_s1`.`games` (`game_name`) VALUES ('"+self.game_name+"');"
-                csr.execute(sql)
-                cnx.commit()
-                upts_db.CloseDB(cnx)
-            except Exception as err:
-                    print("Failed inserting record: {}".format(err))
-                    upts_db.CloseDB(cnx)
-
-            # Get games_idgames    
-            cnx = upts_db.OpenDB()
-            csr = cnx.cursor()
-            self.sql = "SELECT * FROM `upts_s1`.`games` WHERE (`game_name`) = '" + self.game_name + "'"
-            csr.execute(self.sql)
-            for (game_name) in csr:
-                self.games_idgames = game_name[0]
-            print (self.games_idgames)
-            upts_db.CloseDB(cnx)
-        
-
-        # Game Notes
-        @db_con
-        def notes_to_db (self):
-            for note in self.game_notes:
-                for key in note :
-                    self.csr = self.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, note[key]))
-                    self.sql = "INSERT INTO notes (gnote_name, gnote_details, games_idgames) VALUES (%s , %s, %s)"
-                    self.val = (key, note[key], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-                    
-        # Currency
-        @db_con
-        def cur_to_db(self):
-            for cur in self.game_currency:
-                for key in cur :
-                    self.csr = self.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, cur[key]))
-                    self.sql = "INSERT INTO currencies (game_currency, currency_note, games_idgames) VALUES (%s , %s, %s)"
-                    self.val = (key, cur[key], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-
-        # Trophies
-        @db_con
-        def trophies_to_db(self):
-            for trophy in self.game_trophies:
-                for key in trophy:
-                    self.csr = self.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, trophy[key]))
-                    self.sql = "INSERT INTO trophies (trophy_name, trophy_description, games_idgames) VALUES (%s , %s, %s)"
-                    self.val = (key, trophy[key], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-
-        # Acheivements
-        @db_con
-        def ach_to_db(self):
-            for achievement in self.game_ach:
-                for key in achievement:
-                    self.csr = self.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, achievement[key]))
-                    self.sql = "INSERT INTO achievements (ach_name, ach_desc, games_idgames) VALUES (%s , %s, %s)"
-                    self.val = (key, achievement[key], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-
-        # Game Items
-        @db_con
-        def items_to_db (self):
-            for item in self.game_items:
-                for key in item:
-                    self.csr = self.cnx.cursor()
-                    print ("key: %s , value: %s, %s, %s" % (key, item[key][0], item[key][1], item[key][2]))
-                    self.sql = "INSERT INTO items (item_name, item_desc, item_cost, cost_unit, games_idgames) VALUES (%s , %s, %s, %s, %s)"
-                    self.val = (key, item[key][0], item[key][1], item[key][2], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-
-
-        def to_db(self):
-            name_to_db(self)
-            notes_to_db (self)
-            cur_to_db (self)
-            trophies_to_db (self)
-            ach_to_db (self)
-            items_to_db (self)
-            
-            print("Game Records Inserted")
-
-        to_db(self)
-        
+    def save_game_to_db(self):
+        pass
 
 # ----------  START DATABASE FUNCTIONS
 
@@ -265,7 +145,6 @@ class upts_db():
 
     # Close Database Connection
     def CloseDB(cnx):
-        print ('should be closing')
         c = cnx.cursor()
         c.close()
         cnx.close()
@@ -306,39 +185,39 @@ class UserCon():
 
     def GetUsers():
 
-        cnx = upts_db.OpenDB()
+        cnx = OpenDB()
         cursor = cnx.cursor()
         query = ("SELECT * FROM users")
         cursor.execute(query)
         for (username) in cursor:
             print("{}".format(username))
-        upts_db.CloseDB(cnx)
+        CloseDB(cnx)
 
-    def AddUser( un, pw):
-        print ('Should open con from inside Adduser')
-        cnx = upts_db.OpenDB()
+    def AddUser(un, pw):
+
+        cnx = OpenDB()
         cursor = cnx.cursor()
         sql = "INSERT INTO users (username, password) VALUES (%s, %s)"
         val = (un, pw)
         cursor.execute(sql, val)
         cnx.commit()
         print("1 record inserted, ID:", cursor.lastrowid)
-        upts_db.CloseDB(cnx)
+        CloseDB(cnx)
 
     def SignIn(un, pw):
 
         print('Trying to Validate')
-        cnx = upts_db.OpenDB()
+        cnx = OpenDB()
         cursor = cnx.cursor()
         sql = 'SELECT * FROM users WHERE username = "' + un + '"'
         # print (sql)
         cursor.execute(sql)
         for response in cursor:
             if response[2] == pw:
-                upts_db.CloseDB(cnx)
-                return "Valid", response[0]
+                CloseDB(cnx)
+                return "Valid"
             else:
-                upts_db.CloseDB(cnx)
+                CloseDB(cnx)
                 return "Invalid Username or Password"
 
     def UserRecover():
@@ -354,40 +233,32 @@ class PlayerCon():
 
     def GetPlayers(un):
         players = []
-        cnx = upts_db.OpenDB()
+        cnx = OpenDB()
         cursor = cnx.cursor()
-        sql = "SELECT * FROM users WHERE username = '" + un + "'"
+        sql = "SELECT * FROM players WHERE username = '" + un + "'"
         val = un
         cursor.execute(sql)
-        for userx in cursor:
-            users_idusers = str (userx[0])
-
-        sql = "SELECT * FROM players WHERE users_idusers = '" + users_idusers + "'"
-        cursor.execute(sql)
-        for userx in cursor:
-            player_id = userx[0]
-            player_name = userx[1]
-            print (player_id)
+        for (player_name) in cursor:
             print("{}".format(player_name))
             players.append(player_name)
-        upts_db.CloseDB(cnx)
+        CloseDB(cnx)
         return players
 
 
     def AddPlayer(un, pn):
 
-        cnx = upts_db.OpenDB()
+        cnx = OpenDB()
         cursor = cnx.cursor()
-        sql = "INSERT INTO players (users_idusers, player_name) VALUES (%s, %s)"
+        sql = "INSERT INTO players (username, player_name) VALUES (%s, %s)"
         val = (un, pn)
         cursor.execute(sql, val)
         cnx.commit()
         print("1 record inserted, ID:", cursor.lastrowid)
-        upts_db.CloseDB(cnx)
+        CloseDB(cnx)
 
     def removePlayer(player):
 
-        cnx = upts_db.OpenDB()
+        cnx = OpenDB()
         cursor = cnx.cursor()
         sql = "DELETE FROM `upts_s1`.`players` WHERE (`idplayers` = '"
         sql += str(player[0]) + "')"
@@ -395,7 +266,7 @@ class PlayerCon():
         cursor.execute(sql)
         cnx.commit()
         print("1 record removed.")
-        upts_db.CloseDB(cnx)
+        CloseDB(cnx)
 
 
 class GameCon():
@@ -409,7 +280,7 @@ class GameCon():
     def GetGames(game_name):
 
         games = []
-        cnx = upts_db.OpenDB()
+        cnx = OpenDB()
         cursor = cnx.cursor()
         sql = "SELECT * FROM games WHERE game_name = '" + game_name + "'"
         val = un
@@ -417,26 +288,26 @@ class GameCon():
         for (game_name) in cursor:
             print("{}".format(game_name))
             games.append(game_name)
-        upts_db.CloseDB(cnx)
+        CloseDB(cnx)
         return games
 
     def AddGame(game_name, game_currency, game_trophies, game_ach, game_items):
 
-        cnx = upts_db.OpenDB()
+        cnx = OpenDB()
         cursor = cnx.cursor()
         sql = "INSERT INTO games (game_name, game_currency,game_trophies, game_ach,game_items) VALUES (%s, %s, %s, %s, %s )"
         val = (game_name, game_currency, game_trophies, game_ach, game_items)
         cursor.execute(sql, val)
         cnx.commit()
         print("1 record inserted, ID:", cursor.lastrowid)
-        upts_db.CloseDB(cnx)
+        CloseDB(cnx)
 
     def AddGame_json(game_name, game_currency, game_trophies, game_ach, game_items):
 
         cnx = OpenDB()
         cursor = cnx.cursor()
-        self.sql = "INSERT INTO games (game_name, game_currency,game_trophies, game_ach,game_items) VALUES (%s, %s, %s, %s, %s )"
-        self.val = (game_name, game_currency, game_trophies, game_ach, game_items)
+        sql = "INSERT INTO games (game_name, game_currency,game_trophies, game_ach,game_items) VALUES (%s, %s, %s, %s, %s )"
+        val = (game_name, game_currency, game_trophies, game_ach, game_items)
         cursor.execute(sql, val)
         cnx.commit()
         print("1 record inserted, ID:", cursor.lastrowid)
@@ -446,7 +317,7 @@ class GameCon():
 
         cnx = OpenDB()
         cursor = cnx.cursor()
-        self.sql = "DELETE FROM `upts_s1`.`games` WHERE (`idgame` = '"
+        sql = "DELETE FROM `upts_s1`.`games` WHERE (`idgame` = '"
         sql += str(game_name[0]) + "')"
         print (sql)
         cursor.execute(sql)
@@ -555,12 +426,12 @@ def LoginMenu():
                 print("Oops!",sys.exc_info()[0],"occured.")
 
             try:
-                userVal,users_idusers = UserCon.SignIn(aUser, aPass)
+                userVal = UserCon.SignIn(aUser, aPass)
                 if userVal == None:
-                    upts_db.CloseDB(cnx)
+                    CloseDB(cnx)
                 elif userVal == "Valid":
                     loggingIn = False
-                    return aUser, users_idusers
+                    return aUser
                 else:
                     print (userVal)
             except:
@@ -573,7 +444,6 @@ def LoginMenu():
                 print ('PASSWORD WILL BE VISIBLE!')
                 print ("ONLY USE A TEMPORARY TEST PASSWORD YOU DON'T CARE IF ANYONE SEES!")
                 aUser, aPass = input("Enter new Username and Password (Username, Password): ").split(',')
-                print ('Should add user')
                 UserCon.AddUser(aUser, aPass)
 
             except:
@@ -592,7 +462,7 @@ def LoginMenu():
 
 
 #  Player Menu
-def PlayerMenu(aUser,users_idusers):
+def PlayerMenu(aUser):
     PlayerMenuing = True
 
     while (PlayerMenuing):
@@ -621,7 +491,7 @@ def PlayerMenu(aUser,users_idusers):
         elif menuChoice == '2':                             # Add a Player
             aName = input(
                 "Enter new Player Name: ")
-            PlayerCon.AddPlayer(users_idusers, aName)
+            PlayerCon.AddPlayer(aUser, aName)
 
         elif menuChoice == '3':                             # Remove a Player
             print ('Player Key | Player Information')
@@ -652,9 +522,9 @@ def MainLoop():
 
         # Call the LoginMenu
         if thisUser == "":
-            thisUser, users_idusers = LoginMenu()
+            thisUser = LoginMenu()
             print ()
-            print("User Logged In: ",thisUser)
+            print("User: ",thisUser)
             if thisUser == 'Quit':
                 mainLooping = False
                 break
@@ -677,14 +547,14 @@ def MainLoop():
             mainLooping = False
             break
         elif menuChoice == '1':
-            PlayerMenu(thisUser,users_idusers)
+            PlayerMenu(thisUser)
         elif menuChoice == '2':
             print('Need to add Game Menu')
         elif menuChoice == '3':
             print('Need to add Reports Menu \n')
             UserCon.GetUsers()
         elif menuChoice == '4':
-            PlayerCon.ListPlayers(users_idusers)
+            PlayerCon.ListPlayers()
             
         else:
             print()
@@ -705,24 +575,20 @@ def test_Game():
         {'Note 1' : 'A space-based MMO.'},
         {'Note 2' : 'ISK is both in-game currency and real-world currency of Iceland where the game was developed.'}
     ]
-    game_currency = [
-        {"Gold Dollar" : "Most valuable"},
-        {"Silver Quarter" : "Second biggest Unit.  1/4 of a dollar."},
-        {"Bronze Dime" : "Third unit.  1/10 of a dollar."}
-    ]
+    game_currency = "Test Currency"
     game_trophies = [
-        {"Test Trophy One" : "An awesome test trophy" },
-        {"Test Trophy Two" : "An second awesome test trophy" }
+        {"Test Trophy One" : {"Description" : "An awesome test trophy" }},
+        {"Test Trophy Two" : {"Description" : "An second awesome test trophy" }}
     ]
     game_ach = [
-        {"Com L1 Normal" : "Completed Level One on Normal Difficulty" },
-        {"Com L1 Quick" : "Completed Level One Normal Difficulty in less than 2 minutes" },
-        {"Com L2 Hard" : "Completed Level Two on Hard Difficulty" }
+        {"Com L1 Normal" : {"Description" : "Completed Level One on Normal Difficulty" }},
+        {"Com L1 Quick" : {"Description" : "Completed Level One Normal Difficulty in less than 2 minutes" }},
+        {"Com L2 Hard" : {"Description" : "Completed Level Two on Hard Difficulty" }}
     ]
     game_items = [
-        {"Jelly Gun" : ["Portable Jelly Gun" , 500, "Silver" ]},
-        {"Marshmellow Gun" : ["Portable Marshmellow Gun", 250, "Dollars"]},
-        {"Marshmellow Cannon" : ["Stationary Marshmellow Cannon" , 1000, "Dollars" ]}
+        {"jelly_gun" : [{"Description" : "Jelly Gun" }, {"Cost" : 500 }]},
+        {"mar_gun" : [{"Description" : "Marshmellow Gun" }, {"Cost" : 750 }]},
+        {"mar_cannon" : [{"Description" : "Marshmellow Cannon" }, {"Cost" : 1000 }]}
     ]
 
     testGame_labels = {
@@ -748,11 +614,11 @@ def test_Game():
     
     TestGame.save_json_pd()
 
+    print(TestGame.game_notes)
+
     TestGame.load_json_pd()
 
-    TestGame.save_to_db()
-
-    print ('Test Complete')
+    print (TestGame.allGames)
 
 test_Game()
 
@@ -851,14 +717,3 @@ def sample_data_and_normalize():
 
     json_normalize(data, ['game', ['info', 'currency']])
     '''
-
-
-def inc(x):
-    return x + 1
-
-def dec(x):
-    return x - 1
-
-def operate(func, x):
-    result = func(x)
-    return result
