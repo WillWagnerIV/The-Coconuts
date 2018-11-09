@@ -12,7 +12,7 @@ User Stories:
 User = dev, designer, engineer or QA
 
 1)	Login
-	⁃	As a user I want to be able to log in so I can access the features of the system.  
+	⁃	As a user I need to be able to log in so I can access the features of the system.  
 	⁃	As a user I need to be able to retrieve lost login info or create a new user account so that I can access the features of the system.
 	⁃	Description: Registration screen for the developer to access the system
 	⁃	Description Login screen for a registered user
@@ -73,7 +73,7 @@ Milestone 2 - Dec. 6 2018
 	⁃	Usability testing 
 	⁃	Menus Organization 
 	⁃	Ease of use
-	⁃	pytest Functions
+4)	pytest Functions
 	⁃	Add/Delete/Modify User
 	⁃	Add/Delete/Modify Game
 	⁃	Add/Delete/Modify Players
