@@ -35,14 +35,14 @@ class upts_game():
         self.game_ach = game_ach
         self.game_items = game_items
 
+        self.total_game_count += 1
+        self.allGames.append(self.game_name)
+
         self.sql = ""
         self.val = ""
         self.cnx = ""
         self.csr = ""
         self.games_idgames = ""
-
-        self.total_game_count += 1
-        self.allGames.append(self.game_name)
 
     def convert_class_to_dict(self):
         game_name = self.game_name
@@ -84,9 +84,8 @@ class upts_game():
         return dataframe
 
     # Save each property to their respective databases
-    def save_to_db(self, session_userid):
+    def save_to_db(self):
         
-        # Use a decorator to open/close database connection
         def db_con (func):
             def inner (*args, **kwargs):
                 self.cnx = upts_db.OpenDB()
@@ -124,6 +123,7 @@ class upts_game():
                 self.games_idgames = game_name[0]
             print (self.games_idgames)
             upts_db.CloseDB(cnx)
+        
 
         # Game Notes
         @db_con
@@ -185,35 +185,19 @@ class upts_game():
                     self.csr.execute(self.sql, self.val)
                     self.cnx.commit()
 
-        # Register user with games_has_users database
-        @db_con
-        def game_has_user (self, session_userid):
-            print (session_userid , self.games_idgames)
-            if session_userid != "None":
-                csr = self.cnx.cursor()
-                try:
-                    self.sql = "INSERT INTO games_has_users (users_idusers,games_idgames) VALUES (%s , %s)"
-                    self.val = (session_userid , self.games_idgames)
-                    csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-                except Exception as err:
-                        print("Failed inserting record: {}".format(err))
 
-        
+        def to_db(self):
 
-        name_to_db(self)
-        notes_to_db (self)
-        cur_to_db (self)
-        trophies_to_db (self)
-        ach_to_db (self)
-        items_to_db (self)
-        game_has_user (self, session_userid)
-        
-        print("Game Records Inserted")
-     
+            name_to_db(self)
+            notes_to_db (self)
+            cur_to_db (self)
+            trophies_to_db (self)
+            ach_to_db (self)
+            items_to_db (self)
+            
+            print("Game Records Inserted")
 
-    
-
+        to_db(self)       
 
 # ----------  START DATABASE FUNCTIONS
 
@@ -280,7 +264,7 @@ class upts_db():
 
     # Close Database Connection
     def CloseDB(cnx):
-        # print ('should be closing')
+        print ('should be closing')
         c = cnx.cursor()
         c.close()
         cnx.close()
@@ -315,20 +299,9 @@ class upts_db():
 # ----------  START TABLECONS
 
 class upts_user():
-
-    # Class Variables
-    total_user_count = 0
-    allUsers = []
     
-    def __init__(self, name = "Default User Name", un = "username", pw = "password", uid = 0):
-
-        self.name = name
-        self.user_name = un
-        self.pw = pw
-        self.uid = uid
-
-        self.loginVal = None
-        
+    def __init__(self):
+        print('\n')
 
     def GetUsers():
 
@@ -353,7 +326,7 @@ class upts_user():
 
     def SignIn(un, pw):
 
-        # print('Trying to Validate')
+        print('Trying to Validate')
         cnx = upts_db.OpenDB()
         cursor = cnx.cursor()
         sql = 'SELECT * FROM users WHERE username = "' + un + '"'
@@ -362,12 +335,7 @@ class upts_user():
         for response in cursor:
             if response[2] == pw:
                 upts_db.CloseDB(cnx)
-
-                session_user = upts_user (name = "Default First Last Name", un = un , pw = pw , uid = response[0])
-                session_user.loginVal = "Valid"
-
-                return session_user
-
+                return "Valid", response[0]
             else:
                 upts_db.CloseDB(cnx)
                 return "Invalid Username or Password"
@@ -376,41 +344,31 @@ class upts_user():
 
         print('This is where the screens to assist with credentials would go.')
 
-    def Load_games_from_db (upts_user):
-
-        cnx = upts_db.OpenDB()
-        cursor = cnx.cursor()
-        sql = 'SELECT * FROM games_has_users WHERE users_idusers = "' + str(upts_user.uid) + '"'
-        cursor.execute(sql)
-        for game in cursor:
-            games_idgames = game[0]
-            users_idusers = game[1]
-            sql = 'SELECT * FROM games WHERE idgames = "' + str(games_idgames) + '"'
-            cursor.execute(sql)
-            for game in cursor:
-                print (game[1])
-
-        upts_db.CloseDB(cnx)
-
 
 class upts_player():
 
-    def __init__(self, player_id = 0, player_name = "None"):
-        self.player_id = player_id
-        self.player_name = player_name
+    def __init__(self):
+        print('\n')
 
 
-    def GetPlayers(user_id):
+    def GetPlayers(un):
         players = []
         cnx = upts_db.OpenDB()
         cursor = cnx.cursor()
-        sql = "SELECT * FROM players WHERE users_idusers = '" + str(user_id) + "'"
+        sql = "SELECT * FROM users WHERE username = '" + un + "'"
+        val = un
         cursor.execute(sql)
-        for playerx in cursor:
-            temp_player = upts_player (player_id = playerx[0], player_name = playerx[1])
-            print("{0}   {1}".format(temp_player.player_id, temp_player.player_name))
-            players.append(temp_player)
+        for userx in cursor:
+            users_idusers = str (userx[0])
 
+        sql = "SELECT * FROM players WHERE users_idusers = '" + users_idusers + "'"
+        cursor.execute(sql)
+        for userx in cursor:
+            player_id = userx[0]
+            player_name = userx[1]
+            print (player_id)
+            print("{}".format(player_name))
+            players.append(player_name)
         upts_db.CloseDB(cnx)
         return players
 
@@ -426,12 +384,12 @@ class upts_player():
         print("1 record inserted, ID:", cursor.lastrowid)
         upts_db.CloseDB(cnx)
 
-    def removePlayer(player_id):
+    def removePlayer(player):
 
         cnx = upts_db.OpenDB()
         cursor = cnx.cursor()
         sql = "DELETE FROM `upts_s1`.`players` WHERE (`idplayers` = '"
-        sql += str(player_id) + "')"
+        sql += str(player[0]) + "')"
         print (sql)
         cursor.execute(sql)
         cnx.commit()
@@ -593,16 +551,17 @@ def LoginMenu():
                 aUser, aPass = input(
                     "Enter Username and Password (Username, Password): ").split(',')
             except:
-                print("Invalid input.  Please try again. ",sys.exc_info()[0],"occured.")
+                print("Oops!",sys.exc_info()[0],"occured.")
 
             try:
-                session_user = upts_user.SignIn(aUser, aPass)
-                if session_user.loginVal == None:
-                    upts_db.CloseDB(upts_db.cnx)
-                elif session_user.loginVal == "Valid":
+                userVal,users_idusers = upts_user.SignIn(aUser, aPass)
+                if userVal == None:
+                    upts_db.CloseDB(cnx)
+                elif userVal == "Valid":
                     loggingIn = False
-                    return session_user
-
+                    return aUser, users_idusers
+                else:
+                    print (userVal)
             except:
                 print("Oops!",sys.exc_info()[0],"occured.")
             
@@ -632,7 +591,7 @@ def LoginMenu():
 
 
 #  Player Menu
-def PlayerMenu(session_user):
+def PlayerMenu(aUser,users_idusers):
     PlayerMenuing = True
 
     while (PlayerMenuing):
@@ -642,6 +601,7 @@ def PlayerMenu(session_user):
         print(' 1 - List My Players')
         print(' 2 - Add a Player')
         print(' 3 - Remove a Player')
+        print(' 4 - Edit a Player')
         print(' 0 - Return to Main Menu')
         print()
 
@@ -655,66 +615,26 @@ def PlayerMenu(session_user):
             break
 
         elif menuChoice == '1':                             # List Players
-            upts_player.GetPlayers(session_user.uid)
+            upts_player.GetPlayers(aUser)
 
         elif menuChoice == '2':                             # Add a Player
             aName = input(
                 "Enter new Player Name: ")
-            upts_player.AddPlayer(session_user.uid, aName)
+            upts_player.AddPlayer(users_idusers, aName)
 
         elif menuChoice == '3':                             # Remove a Player
             print ('Player Key | Player Information')
-            players_list = upts_player.GetPlayers(session_user.uid)
+            players_list = upts_player.GetPlayers(aUser)
             pk = int(input ('Enter Player Key: '))
             for player in players_list:
-                if int(pk) == player.player_id:
-                    print ('Are you sure you want to remove ' + str(player.player_name))
+                if pk == player[0]:
+                    print ('Are you sure you want to remove ' + str(player))
                     double_check = input ('Enter y to Confirm Delete - There is no reversing this action!')
                     if double_check == 'y':
-                        upts_player.removePlayer (player.player_id)
+                        upts_player.removePlayer (player)
 
-        # elif menuChoice == '4':                             # Edit a Player
-        #     print('Edit a Player')
-
-        else:
-            print()
-            print('Please choose one of the options above.')
-            print()
-
-
-def GamesMenu(session_user):
-    GamesMenuing = True
-
-    while (GamesMenuing):
-        print()
-        print('       ###   Games Menu   ###')
-        print()
-        print(' 1 - List My Games')
-        print(' 2 - Add a Game')
-        print(' 3 - Remove a Game')
-        print(' 0 - Return to Main Menu')
-        print()       
-
-        menuChoice = input(' Selection: ')
-
-        if menuChoice in ("0","1", "2", "3"):
-            print()
-
-        if menuChoice == '0':                               # Main Menu
-            GamesMenuing = False
-            break
-
-        elif menuChoice == '1':                             # List Games
-            upts_user.Load_games_from_db(session_user)
-
-        elif menuChoice == '2':                             # Add a Game
-            aName = input(
-                "Place .json file in json folder and enter name here: ")
-            # upts_game.....
-
-        elif menuChoice == '3':                             # Remove Game
-            upts_player.GetPlayers(session_user.uid)
-
+        elif menuChoice == '4':                             # Edit a Player
+            print('Edit a Player')
 
         else:
             print()
@@ -725,19 +645,18 @@ def GamesMenu(session_user):
 #  Main Loop
 def MainLoop():
     mainLooping = True
-    session_user = ""
+    thisUser = ""
 
     while (mainLooping):
 
-        if session_user == 'Quit':
-            mainLooping = False
-            break
-
         # Call the LoginMenu
-        elif session_user == "":
-            session_user = LoginMenu()
+        if thisUser == "":
+            thisUser, users_idusers = LoginMenu()
             print ()
-            print("User Logged In: ",session_user.name)
+            print("User Logged In: ",thisUser)
+            if thisUser == 'Quit':
+                mainLooping = False
+                break
 
         # Main 3 Choices
 
@@ -755,14 +674,14 @@ def MainLoop():
             print()
         if menuChoice == '0':
             mainLooping = False
-            session_user == 'Quit'
             break
         elif menuChoice == '1':
-            PlayerMenu(session_user)
+            PlayerMenu(thisUser,users_idusers)
         elif menuChoice == '2':
-            GamesMenu(session_user)
+            print('Need to add Game Menu')
         elif menuChoice == '3':
-            ReportsMenu(session_user)
+            print('Need to add Reports Menu \n')
+            upts_user.GetUsers()
         elif menuChoice == '4':
             upts_player.ListPlayers(users_idusers)
             
@@ -828,10 +747,9 @@ def test_Game():
     
     TestGame.save_json_pd()
 
-    TestGame.save_to_db(session_userid = 8)
-
     TestGame.load_json_pd()
 
+    TestGame.save_to_db()
 
     print ('Test Complete')
 
