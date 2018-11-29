@@ -212,11 +212,6 @@ class upts_game():
         print("Game Records Inserted")
      
 
-    
-
-
-# ----------  START DATABASE FUNCTIONS
-
 class upts_db():
     # Create Database - NOT WORKING YET - Included for Reference
     def create_database(cursor):
@@ -312,7 +307,6 @@ class upts_db():
             print(str(identifier))
             # dropTable(cnx, 'users')
 
-# ----------  START TABLECONS
 
 class upts_user():
 
@@ -388,7 +382,7 @@ class upts_user():
             sql = 'SELECT * FROM games WHERE idgames = "' + str(games_idgames) + '"'
             cursor.execute(sql)
             for game in cursor:
-                print (game[1])
+                print (game[0],game[1])
 
         upts_db.CloseDB(cnx)
 
@@ -437,6 +431,36 @@ class upts_player():
         cnx.commit()
         print("1 record removed.")
         upts_db.CloseDB(cnx)
+
+
+class upts_report():
+
+    # Use a decorator to open/close database connection
+    def db_con (func):
+        def inner (*args, **kwargs):
+            upts_db.cnx = upts_db.OpenDB()
+            upts_db.cursor = upts_db.cnx.cursor()
+
+            try:
+                func ( *args, **kwargs)
+                
+            except Exception as err:
+                print("Failed accessing record: {}".format(err))
+                
+            upts_db.CloseDB(upts_db.cnx)
+
+        return inner
+
+    @db_con
+    def list_all_games ():
+        query = ("SELECT * FROM games")
+        upts_db.cursor.execute(query)
+        for (game_name) in upts_db.cursor:
+            print("{}".format(game_name))
+
+
+
+
 
 
 class GameCon():
@@ -586,7 +610,7 @@ def LoginMenu():
 
         if menuChoice == '0':
             loggingIn = False
-            return "Quit",0
+            return "Quit"
 
         elif menuChoice == '1':
             try:
@@ -668,8 +692,8 @@ def PlayerMenu(session_user):
             pk = int(input ('Enter Player Key: '))
             for player in players_list:
                 if int(pk) == player.player_id:
-                    print ('Are you sure you want to remove ' + str(player.player_name))
-                    double_check = input ('Enter y to Confirm Delete - There is no reversing this action!')
+                    print ('Are you sure you want to remove: ' + str(player.player_name))
+                    double_check = input (' Enter y to Confirm Delete - There is no reversing this action!')
                     if double_check == 'y':
                         upts_player.removePlayer (player.player_id)
 
@@ -708,8 +732,8 @@ def GamesMenu(session_user):
             upts_user.Load_games_from_db(session_user)
 
         elif menuChoice == '2':                             # Add a Game
-            aName = input(
-                "Place .json file in json folder and enter name here: ")
+            upts_report.list_all_games()
+            gameID = input("Enter Game ID: ")
             # upts_game.....
 
         elif menuChoice == '3':                             # Remove Game
@@ -723,21 +747,24 @@ def GamesMenu(session_user):
 
 
 #  Main Loop
+
+
 def MainLoop():
     mainLooping = True
-    session_user = ""
+    session_user = "None"
 
     while (mainLooping):
+
+        # Call the LoginMenu
+        if session_user == "None":
+            session_user = LoginMenu()
+            print ()
+            if session_user != "Quit":
+                print("User Logged In: ",session_user.name)
 
         if session_user == 'Quit':
             mainLooping = False
             break
-
-        # Call the LoginMenu
-        elif session_user == "":
-            session_user = LoginMenu()
-            print ()
-            print("User Logged In: ",session_user.name)
 
         # Main 3 Choices
 
@@ -746,7 +773,7 @@ def MainLoop():
         print()
         print(' 1 - Players Menu')
         print(' 2 - Games Menu')
-        print(' 3 - Reports Menu')
+        print(' 3 - Reports and Admin Menu')
         print(' 0 - Quit')
         print()
         menuChoice = input(' Selection: ')
@@ -760,9 +787,9 @@ def MainLoop():
         elif menuChoice == '1':
             PlayerMenu(session_user)
         elif menuChoice == '2':
-            GamesMenu(session_user)
+            GamesMenu( session_user)
         elif menuChoice == '3':
-            ReportsMenu(session_user)
+            ReportsMenu( session_user)
         elif menuChoice == '4':
             upts_player.ListPlayers(users_idusers)
             
@@ -835,7 +862,7 @@ def test_Game():
 
     print ('Test Complete')
 
-test_Game()
+# test_Game()
 
 class TestFuncts():
 
