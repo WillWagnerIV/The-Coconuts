@@ -48,7 +48,7 @@ def test_Game():
         'game_items' : game_items
     }
 
-    testGame = {
+    testGame_alt_labels = {
         game_name : {
         'game_notes' : game_notes,
         'game_currency' : game_currency,

@@ -2,12 +2,79 @@ from upts_main import *
 import pytest
 
 #input output values for account with balance $500
-game_params = (
-    (20, 520),
-    (30, 530),
-    (-35, 465),
-    (12, 512)
-)
+# input_output = (
+#     (20, 520),
+#     (30, 530),
+#     (-35, 465),
+#     (12, 512)
+# )
+
+
+        
+game_name = "Test Game"
+game_notes = [
+    {'Note 1' : 'A space-based MMO.'},
+    {'Note 2' : 'ISK is both in-game currency and real-world currency of Iceland where the game was developed.'}
+]
+game_currency = [
+    {"Gold Dollar" : "Most valuable"},
+    {"Silver Quarter" : "Second biggest Unit.  1/4 of a dollar."},
+    {"Bronze Dime" : "Third unit.  1/10 of a dollar."}
+]
+game_trophies = [
+    {"Test Trophy One" : "An awesome test trophy" },
+    {"Test Trophy Two" : "An second awesome test trophy" }
+]
+game_ach = [
+    {"Com L1 Normal" : "Completed Level One on Normal Difficulty" },
+    {"Com L1 Quick" : "Completed Level One Normal Difficulty in less than 2 minutes" },
+    {"Com L2 Hard" : "Completed Level Two on Hard Difficulty" }
+]
+game_items = [
+    {"Jelly Gun" : ["Portable Jelly Gun" , 500, "Silver" ]},
+    {"Marshmellow Gun" : ["Portable Marshmellow Gun", 250, "Dollars"]},
+    {"Marshmellow Cannon" : ["Stationary Marshmellow Cannon" , 1000, "Dollars" ]}
+]
+
+testGame_labels = {
+    'game_name' : game_name,
+    'game_notes' : game_notes,
+    'game_currency' : game_currency,
+    'game_trophies' : game_trophies,
+    'game_ach' : game_ach,
+    'game_items' : game_items
+}
+
+testGame_alt_labels = {
+    game_name : {
+    'game_notes' : game_notes,
+    'game_currency' : game_currency,
+    'game_trophies' : game_trophies,
+    'game_ach' : game_ach,
+    'game_items' : game_items
+    }
+}
+
+TestGame = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
+
+# Create test for adding User
+
+# Create test for deleting user
+
+# Create test for adding player
+
+# Create test for deleting player
+
+# Create Test for adding game
+
+# Create test for deleting game
+
+# Create test for player report
+
+# Create test for games report
+
+
+
 
 #parametrized fixture
 @pytest.fixture(params=input_output)
