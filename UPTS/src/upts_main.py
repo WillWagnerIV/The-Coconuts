@@ -261,13 +261,15 @@ class upts_db():
             cnx = mysql.connect(user=db_user, password=db_password,
                                         host=db_host,
                                         database=db_master)
-            print('Connection Opened')
+            # print('Connection Opened: ' + str(cnx))
             return cnx
         except mysql.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Something is wrong with your user name or password")
+                print("Something is wrong with Database user name or password")
+                return err
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
                 print("Database does not exist")
+                return err
             else:
                 print(err)
                 return err
@@ -276,10 +278,12 @@ class upts_db():
     # Close Database Connection
     def CloseDB(cnx):
         # print ('should be closing')
-        c = cnx.cursor()
-        c.close()
-        cnx.close()
-        print('Connection Closed')
+        # c = cnx.cursor()
+        # c.close()
+        # cnx.close()
+        # if cnx.close() == None:
+        #      print('Connection Closed')
+        return cnx
 
     # ----------  START DATABASE TABLE FUNCTIONS
 
@@ -344,6 +348,7 @@ class upts_user():
         cnx.commit()
         print("1 record inserted, ID:", cursor.lastrowid)
         upts_db.CloseDB(cnx)
+        return cursor.lastrowid
 
     def SignIn(un, pw):
 
@@ -351,7 +356,7 @@ class upts_user():
         cnx = upts_db.OpenDB()
         cursor = cnx.cursor()
         sql = 'SELECT * FROM users WHERE username = "' + un + '"'
-        # print (sql)
+        print (sql)
         cursor.execute(sql)
         for response in cursor:
             if response[2] == pw:
@@ -616,8 +621,10 @@ def LoginMenu():
             try:
                 session_user = upts_user.SignIn(aUser, aPass)
                 if session_user.loginVal == None:
+                    # print ('none : ' + session_user.user_name)
                     upts_db.CloseDB(upts_db.cnx)
                 elif session_user.loginVal == "Valid":
+                    print (session_user.user_name)
                     loggingIn = False
                     return session_user
 
