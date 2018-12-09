@@ -3,14 +3,14 @@ from io import StringIO
 import json
 import mysql.connector as mysql
 from mysql.connector import errorcode
-import sqlite3
 import pytest
 import datetime
 import pandas as pd
 from pandas.io.json import json_normalize
 import numpy as np
 import pprint
-import sys
+import os, sys
+import time
 
 
 # Database Connection Variables
@@ -84,8 +84,9 @@ class upts_game():
         return dataframe
 
     # Save each property to their respective databases
-    def save_to_db(self):
+    def save_to_db(self, session_userid):
         
+        # Use a decorator to open/close database connection
         def db_con (func):
             def inner (*args, **kwargs):
                 self.cnx = upts_db.OpenDB()
@@ -123,7 +124,6 @@ class upts_game():
                 self.games_idgames = game_name[0]
             print (self.games_idgames)
             upts_db.CloseDB(cnx)
-        
 
         # Game Notes
         @db_con
@@ -185,21 +185,32 @@ class upts_game():
                     self.csr.execute(self.sql, self.val)
                     self.cnx.commit()
 
+        # Register user with games_has_users database
+        @db_con
+        def game_has_user (self, session_userid):
+            print (session_userid , self.games_idgames)
+            if session_userid != "None":
+                csr = self.cnx.cursor()
+                try:
+                    self.sql = "INSERT INTO games_has_users (users_idusers,games_idgames) VALUES (%s , %s)"
+                    self.val = (session_userid , self.games_idgames)
+                    csr.execute(self.sql, self.val)
+                    self.cnx.commit()
+                except Exception as err:
+                        print("Failed inserting record: {}".format(err))
 
-        def to_db(self):
+        
 
-            name_to_db(self)
-            notes_to_db (self)
-            cur_to_db (self)
-            trophies_to_db (self)
-            ach_to_db (self)
-            items_to_db (self)
-            
-            print("Game Records Inserted")
-
-        to_db(self)       
-
-# ----------  START DATABASE FUNCTIONS
+        name_to_db(self)
+        notes_to_db (self)
+        cur_to_db (self)
+        trophies_to_db (self)
+        ach_to_db (self)
+        items_to_db (self)
+        game_has_user (self, session_userid)
+        
+        print("Game Records Inserted")
+     
 
 class upts_db():
     # Create Database - NOT WORKING YET - Included for Reference
@@ -250,13 +261,15 @@ class upts_db():
             cnx = mysql.connect(user=db_user, password=db_password,
                                         host=db_host,
                                         database=db_master)
-            print('Connection Opened')
+            # print('Connection Opened: ' + str(cnx))
             return cnx
         except mysql.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Something is wrong with your user name or password")
+                print("Something is wrong with Database user name or password")
+                return err
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
                 print("Database does not exist")
+                return err
             else:
                 print(err)
                 return err
@@ -265,10 +278,12 @@ class upts_db():
     # Close Database Connection
     def CloseDB(cnx):
         # print ('should be closing')
-        c = cnx.cursor()
-        c.close()
-        cnx.close()
-        print('Connection Closed')
+        # c = cnx.cursor()
+        # c.close()
+        # cnx.close()
+        # if cnx.close() == None:
+        #      print('Connection Closed')
+        return cnx
 
     # ----------  START DATABASE TABLE FUNCTIONS
 
@@ -296,7 +311,6 @@ class upts_db():
             print(str(identifier))
             # dropTable(cnx, 'users')
 
-# ----------  START TABLECONS
 
 class upts_user():
 
@@ -325,7 +339,7 @@ class upts_user():
         upts_db.CloseDB(cnx)
 
     def AddUser( un, pw):
-        print ('Should open con from inside Adduser')
+        # print ('Should open con from inside Adduser')
         cnx = upts_db.OpenDB()
         cursor = cnx.cursor()
         sql = "INSERT INTO users (username, password) VALUES (%s, %s)"
@@ -334,6 +348,7 @@ class upts_user():
         cnx.commit()
         print("1 record inserted, ID:", cursor.lastrowid)
         upts_db.CloseDB(cnx)
+        return cursor.lastrowid
 
     def SignIn(un, pw):
 
@@ -359,6 +374,22 @@ class upts_user():
     def UserRecover():
 
         print('This is where the screens to assist with credentials would go.')
+
+    def Load_games_from_db (upts_user):
+
+        cnx = upts_db.OpenDB()
+        cursor = cnx.cursor()
+        sql = 'SELECT * FROM games_has_users WHERE users_idusers = "' + str(upts_user.uid) + '"'
+        cursor.execute(sql)
+        for game in cursor:
+            games_idgames = game[0]
+            users_idusers = game[1]
+            sql = 'SELECT * FROM games WHERE idgames = "' + str(games_idgames) + '"'
+            cursor.execute(sql)
+            for game in cursor:
+                print (game[0],game[1])
+
+        upts_db.CloseDB(cnx)
 
 
 class upts_player():
@@ -407,7 +438,36 @@ class upts_player():
         upts_db.CloseDB(cnx)
 
 
-class GameCon():
+class upts_report():
+
+    def __init__(self):
+        print('\n')
+
+    # Use a decorator to open/close database connection
+    def db_con (func):
+        def inner (*args, **kwargs):
+            upts_db.cnx = upts_db.OpenDB()
+            upts_db.cursor = upts_db.cnx.cursor()
+
+            try:
+                func ( *args, **kwargs)
+                
+            except Exception as err:
+                print("Failed accessing record: {}".format(err))
+                
+            upts_db.CloseDB(upts_db.cnx)
+
+        return inner
+
+    @db_con
+    def list_all_games (self):
+        query = ("SELECT * FROM games")
+        upts_db.cursor.execute(query)
+        for (game_name) in upts_db.cursor:
+            print("{}".format(game_name))
+
+
+class Temporary_Game_Functions():
 
     # Class Variables
     # none
@@ -463,11 +523,8 @@ class GameCon():
         print("1 record removed.")
         CloseDB(cnx)
 
-# ----------  END DATABASE FUNCTIONS
 
-# ----------  START JSON FUNCTIONS
-
-class json_funcs:
+class Temporary_json_funcs:
     def __init__(self):
         print('\n')
 
@@ -528,9 +585,7 @@ class json_funcs:
                     "pandas_version": "0.20.0"},
             "data": [{"index": "row 1", "Player Key": "36","Player Name": "A Player Name","col 1": "a", "col 2": "b", "User": "A User Name"}]}
 
-# ----------  END JSON FUNCTIONS
 
-# ----------  START MENUS
 #  Login Menu
 def LoginMenu():
     loggingIn = True
@@ -554,7 +609,7 @@ def LoginMenu():
 
         if menuChoice == '0':
             loggingIn = False
-            return "Quit",0
+            return "Quit"
 
         elif menuChoice == '1':
             try:
@@ -566,8 +621,10 @@ def LoginMenu():
             try:
                 session_user = upts_user.SignIn(aUser, aPass)
                 if session_user.loginVal == None:
+                    # print ('none : ' + session_user.user_name)
                     upts_db.CloseDB(upts_db.cnx)
                 elif session_user.loginVal == "Valid":
+                    print (session_user.user_name)
                     loggingIn = False
                     return session_user
 
@@ -597,7 +654,6 @@ def LoginMenu():
             print()
             print('Please choose one of the options above.')
             print()
-
 
 #  Player Menu
 def PlayerMenu(session_user):
@@ -636,8 +692,8 @@ def PlayerMenu(session_user):
             pk = int(input ('Enter Player Key: '))
             for player in players_list:
                 if int(pk) == player.player_id:
-                    print ('Are you sure you want to remove ' + str(player.player_name))
-                    double_check = input ('Enter y to Confirm Delete - There is no reversing this action!')
+                    print ('Are you sure you want to remove: ' + str(player.player_name))
+                    double_check = input (' Enter y to Confirm Delete - There is no reversing this action!')
                     if double_check == 'y':
                         upts_player.removePlayer (player.player_id)
 
@@ -649,20 +705,65 @@ def PlayerMenu(session_user):
             print('Please choose one of the options above.')
             print()
 
+#  Games Menu
+def GamesMenu(session_user):
+    GamesMenuing = True
+
+    while (GamesMenuing):
+        print()
+        print('       ###   Games Menu   ###')
+        print()
+        print(' 1 - List My Games')
+        print(' 2 - Add a Game')
+        print(' 3 - Remove a Game')
+        print(' 0 - Return to Main Menu')
+        print()       
+
+        menuChoice = input(' Selection: ')
+
+        if menuChoice in ("0","1", "2", "3"):
+            print()
+
+        if menuChoice == '0':                               # Main Menu
+            GamesMenuing = False
+            break
+
+        elif menuChoice == '1':                             # List Games
+            upts_user.Load_games_from_db(session_user)
+
+        elif menuChoice == '2':                             # Add a Game
+            upts_report.list_all_games()
+            gameID = input("Enter Game ID: ")
+            # upts_game.....
+
+        elif menuChoice == '3':                             # Remove Game
+            upts_player.GetPlayers(session_user.uid)
+
+
+        else:
+            print()
+            print('Please choose one of the options above.')
+            print()
+
+#  Reports and Admin Menu
+def ReportsMenu(session_user):
+    pass
 
 #  Main Loop
 def MainLoop():
     mainLooping = True
-    thisUser = ""
+    session_user = "None"
 
     while (mainLooping):
 
         # Call the LoginMenu
-        if thisUser == "":
+        if session_user == "None":
             session_user = LoginMenu()
             print ()
-            print("User Logged In: ",session_user.name)
-        if thisUser == 'Quit':
+            if session_user != "Quit":
+                print("User Logged In: ",session_user.name)
+
+        if session_user == 'Quit':
             mainLooping = False
             break
 
@@ -673,7 +774,7 @@ def MainLoop():
         print()
         print(' 1 - Players Menu')
         print(' 2 - Games Menu')
-        print(' 3 - Reports Menu')
+        print(' 3 - Reports and Admin Menu')
         print(' 0 - Quit')
         print()
         menuChoice = input(' Selection: ')
@@ -682,14 +783,14 @@ def MainLoop():
             print()
         if menuChoice == '0':
             mainLooping = False
+            session_user == 'Quit'
             break
         elif menuChoice == '1':
             PlayerMenu(session_user)
         elif menuChoice == '2':
-            print('Need to add Game Menu')
+            GamesMenu( session_user)
         elif menuChoice == '3':
-            print('Need to add Reports Menu \n')
-            upts_user.GetUsers()
+            ReportsMenu( session_user)
         elif menuChoice == '4':
             upts_player.ListPlayers(users_idusers)
             
@@ -698,174 +799,6 @@ def MainLoop():
             print('Please choose one of the options above.')
             print()
 
-
 MainLoop()
 
-# ---------  END MAIN
 
-# ---------  TESTING
-
-def test_Game():
-        
-    game_name = "Test Game"
-    game_notes = [
-        {'Note 1' : 'A space-based MMO.'},
-        {'Note 2' : 'ISK is both in-game currency and real-world currency of Iceland where the game was developed.'}
-    ]
-    game_currency = [
-        {"Gold Dollar" : "Most valuable"},
-        {"Silver Quarter" : "Second biggest Unit.  1/4 of a dollar."},
-        {"Bronze Dime" : "Third unit.  1/10 of a dollar."}
-    ]
-    game_trophies = [
-        {"Test Trophy One" : "An awesome test trophy" },
-        {"Test Trophy Two" : "An second awesome test trophy" }
-    ]
-    game_ach = [
-        {"Com L1 Normal" : "Completed Level One on Normal Difficulty" },
-        {"Com L1 Quick" : "Completed Level One Normal Difficulty in less than 2 minutes" },
-        {"Com L2 Hard" : "Completed Level Two on Hard Difficulty" }
-    ]
-    game_items = [
-        {"Jelly Gun" : ["Portable Jelly Gun" , 500, "Silver" ]},
-        {"Marshmellow Gun" : ["Portable Marshmellow Gun", 250, "Dollars"]},
-        {"Marshmellow Cannon" : ["Stationary Marshmellow Cannon" , 1000, "Dollars" ]}
-    ]
-
-    testGame_labels = {
-        'game_name' : game_name,
-        'game_notes' : game_notes,
-        'game_currency' : game_currency,
-        'game_trophies' : game_trophies,
-        'game_ach' : game_ach,
-        'game_items' : game_items
-    }
-
-    testGame = {
-        game_name : {
-        'game_notes' : game_notes,
-        'game_currency' : game_currency,
-        'game_trophies' : game_trophies,
-        'game_ach' : game_ach,
-        'game_items' : game_items
-        }
-    }
-
-    TestGame = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
-    
-    TestGame.save_json_pd()
-
-    TestGame.load_json_pd()
-
-    TestGame.save_to_db()
-
-    print ('Test Complete')
-
-test_Game()
-
-class TestFuncts():
-
-    @pytest.mark.xfail
-    def test_login():
-        OpenDB(upts_user)
-        aUser = "asdf"
-        aPass = "kjhkljh"
-        assert upts_user.SignIn(upts_user, aUser, aPass) == "asdf"
-        CloseDB(upts_user)
-
-
-    @pytest.mark.xfail
-    def test_new_user():
-        un = "TestUser"+str(datetime.datetime)
-        pw = "kjhkljh"
-        OpenDB(upts_user)
-        assert upts_user.AddUser(upts_user, un, pw) == upts_user.cursor.lastrowid
-        self.CloseDB()
-
-
-    @pytest.mark.xfail
-    def test_list_users():
-        assert 1 == 5
-
-
-    @pytest.mark.xfail
-    def test_list_players():
-        assert 1 == 5
-
-
-    @pytest.mark.xfail
-    def test_add_player():
-        assert 1 == 5
-
-    # print('\n\n')
-    # print("{}, {} was hired on {:%d %b %Y}".format(
-    #     last_name, first_name, hire_date))
-
-
-    # cnx.execute('''CREATE TABLE COMPANY
-    #          (ID INT PRIMARY KEY     NOT NULL,
-    #          NAME           TEXT    NOT NULL,
-    #          AGE            INT     NOT NULL,
-    #          ADDRESS        CHAR(50),
-    #          SALARY         REAL);''')
-
-def sample_data_and_normalize():
-    '''
-    In [246]: data = [{'state': 'Florida',
-                'shortname': 'FL',
-                'info': {
-                    'governor': 'Rick Scott'
-                },
-                'counties': [{'name': 'Dade', 'population': 12345},
-                            {'name': 'Broward', 'population': 40000},
-                            {'name': 'Palm Beach', 'population': 60000}]},
-                {'state': 'Ohio',
-                'shortname': 'OH',
-                'info': {
-                    'governor': 'John Kasich'
-                },
-                'counties': [{'name': 'Summit', 'population': 1234},
-                            {'name': 'Cuyahoga', 'population': 1337}]}]
-    
-
-    In [247]: json_normalize(data, 'counties', ['state', 'shortname', ['info', 'governor']])
-    '''
-
-    '''
-    data = [
-        {
-        'game': 'Eve',
-        'info': 
-        {
-            'currency': 'ISK',
-            'note': 'A space-based MMO. ISK is both in-game currency and real-world currency of Iceland where the game was developed.'
-        },
-        'items': [{'name': 'Frigate', 'cost': 1000},
-                    {'name': 'Cruiser', 'cost': 40000},
-                    {'name': 'Destroyer', 'cost': 60000}]},
-        {
-        'game': 'Crushy',
-        'info': 
-        {
-            'currency': 'Crushy Bucks',
-            'note': 'A fun destruction-based game by world-renowned designer Will Wagner'
-        },
-        'items': [{'name': 'Bomb', 'cost': 1000},
-                    {'name': 'Gun', 'cost': 750}]}]
-    
-
-    json_normalize(data, 'items', ['game', ['info', 'currency']])
-
-    json_normalize(data, ['game', ['info', 'currency']])
-    '''
-
-
-def inc(x):
-    return x + 1
-
-def dec(x):
-    return x - 1
-
-def operate(func, x):
-    result = func(x)
-    return result
