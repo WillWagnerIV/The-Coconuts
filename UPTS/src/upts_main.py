@@ -339,7 +339,7 @@ class upts_user():
         upts_db.CloseDB(cnx)
 
     def AddUser( un, pw):
-        print ('Should open con from inside Adduser')
+        # print ('Should open con from inside Adduser')
         cnx = upts_db.OpenDB()
         cursor = cnx.cursor()
         sql = "INSERT INTO users (username, password) VALUES (%s, %s)"
