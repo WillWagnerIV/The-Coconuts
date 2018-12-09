@@ -84,6 +84,7 @@ pw = "testpass"
 uid = 0
 player_id = 0
 player_name = "Test Player Name"
+lastrowid = 0
 
 # Test Database Connection
 def test_upts_db():
@@ -107,12 +108,30 @@ def test_creating_objects(create_objects):
 
 
 
-# Test for adding User (actually saves the user to database)
-def test_AddUser():
-    lastrowid = upts_user.AddUser(un, pw)
-    print (lastrowid)
 
-# Test for adding player
+#parametrized tests for Adding new User to DB
+@pytest.mark.parametrize("uname",
+                            [
+                            pytest.param(un, marks=pytest.mark.xpass(reason="Username is unique")),
+                            pytest.param("testuser", marks=pytest.mark.xfail(reason="Username must be unique"))
+                            ]
+)
+def test_advanced_AddUser(uname):
+    lastrowid = upts_user.AddUser(uname, pw)
+    assert lastrowid != 0
+
+
+
+# # Test for adding player
+# @pytest.mark.parametrize("uname",
+#                             [
+#                             pytest.param(un, marks=pytest.mark.xpass(reason="Username is unique")),
+#                             pytest.param("testuser", marks=pytest.mark.xfail(reason="Username must be unique"))
+#                             ]
+# )
+# def test_advanced_AddPlayer(uname):
+#     lastrowid = upts_user.AddUser(uname, pw)
+#     assert lastrowid != 0
 
 # Test for deleting player
 
