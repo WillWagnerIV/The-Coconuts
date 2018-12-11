@@ -1,8 +1,8 @@
 import requests
 from io import StringIO
 import json
-import mysql.connector as mysql
-from mysql.connector import errorcode
+
+
 import pytest
 import datetime
 import pandas as pd
@@ -11,6 +11,7 @@ import numpy as np
 import pprint
 import os, sys
 import time
+
 
 
 # Database Connection Variables
@@ -201,6 +202,7 @@ class upts_game():
 
         
 
+
         name_to_db(self)
         notes_to_db (self)
         cur_to_db (self)
@@ -236,7 +238,7 @@ class upts_db():
 
 
     # Open Database Connection and Print Confirmation
-    # Report Error then Close Connection
+    # If there's an Error, Report Error then Close Connection
     def open_test_close():
         try:
             cnx = mysql.connect(user=db_user, password=db_password,
@@ -800,5 +802,6 @@ def MainLoop():
             print()
 
 MainLoop()
+
 
 
