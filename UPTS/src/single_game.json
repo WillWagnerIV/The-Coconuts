@@ -1,6 +1,0 @@
-{"Test Game":{"game_name":"Test Game"}}
-{"Test Game":{"game_notes":[{"Note 1":"A space-based MMO."},{"Note 2":"ISK is both in-game currency and real-world currency of Iceland where the game was developed."}]}}
-{"Test Game":{"game_currency":"Test Currency"}}
-{"Test Game":{"game_trophies":[{"Test Trophy One":{"Description":"An awesome test trophy"}},{"Test Trophy Two":{"Description":"An second awesome test trophy"}}]}}
-{"Test Game":{"game_ach":[{"Com L1 Normal":{"Description":"Completed Level One on Normal Difficulty"}},{"Com L1 Quick":{"Description":"Completed Level One Normal Difficulty in less than 2 minutes"}},{"Com L2 Hard":{"Description":"Completed Level Two on Hard Difficulty"}}]}}
-{"Test Game":{"game_items":[{"jelly_gun":[{"Description":"Jelly Gun"},{"Cost":500}]},{"mar_gun":[{"Description":"Marshmellow Gun"},{"Cost":750}]},{"mar_cannon":[{"Description":"Marshmellow Cannon"},{"Cost":1000}]}]}}
