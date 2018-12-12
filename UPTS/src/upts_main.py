@@ -36,7 +36,7 @@ class upts_user():
         self.pw = pw
         self.uid = uid
 
-        self.loginVal = None
+        self.loginVal = "Not Valid"
         
 
     def GetUsers():
@@ -79,8 +79,10 @@ class upts_user():
                 return session_user
 
             else:
+                session_user = upts_user (name = "Default Invalid First Last Name", un = un , pw = pw , uid = 0)
                 upts_db.CloseDB(cnx)
-                return "Invalid Username or Password"
+                session_user.loginVal = "Not Valid"
+                return session_user
 
     def UserRecover():
 
@@ -296,6 +298,7 @@ class Temporary_json_funcs:
                     "pandas_version": "0.20.0"},
             "data": [{"index": "row 1", "Player Key": "36","Player Name": "A Player Name","col 1": "a", "col 2": "b", "User": "A User Name"}]}
 
+
 class Main ():
 
     def __init__(self):
@@ -305,8 +308,8 @@ class Main ():
     #  Login Menu
     def LoginMenu():
         loggingIn = True
-        # cnx = OpenDB()
-        # cursor = cnx.cursor()
+        session_user = upts_user()
+
 
         while (loggingIn):
             print()
@@ -325,7 +328,8 @@ class Main ():
 
             if menuChoice == '0':
                 loggingIn = False
-                return "Quit"
+                session_user.loginVal = "Quit"
+                return session_user
 
             elif menuChoice == '1':
                 try:
@@ -333,18 +337,24 @@ class Main ():
                 except:
                     print("Invalid input.  Please try again. ",sys.exc_info()[0],"occured.")
 
-                # try:
-                session_user = upts_user.SignIn(aUser, aPass)
-                if session_user.loginVal == None:
-                    # print ('none : ' + session_user.user_name)
-                    upts_db.CloseDB(upts_db.cnx)
-                elif session_user.loginVal == "Valid":
-                    print (session_user.user_name)
-                    loggingIn = False
-                    return session_user
+                try:
+                    session_user = upts_user.SignIn(aUser, aPass)
+                    if session_user.loginVal == "Not Valid":
+                        print ('Invalid username or password')
+                        # print ('none : ' + session_user.user_name)
+                        # upts_db.CloseDB(cnx)
+                        loggingIn = True
+                        
+                        return session_user
+                        
+                    elif session_user.loginVal == "Valid":
+                        print (session_user.user_name)
+                        loggingIn = False
+                        
+                        return session_user
 
-                # except:
-                    # print("Login System Oops!",sys.exc_info()[0],"occured.")
+                except:
+                    print("Login System Oops!",sys.exc_info()[0],"occured.")
                 
 
             elif menuChoice == '2':
@@ -466,20 +476,25 @@ class Main ():
 
     #  Main Loop
     mainLooping = True
-    session_user = "None"
+    session_user = upts_user()
+    session_user.loginVal == "Not Valid"
 
     while (mainLooping):
 
         # Call the LoginMenu
-        if session_user == "None":
+        while (session_user.loginVal == "Not Valid"):
             session_user = LoginMenu()
             print ()
-            if session_user != "Quit":
-                print("User Logged In: ",session_user.name)
+            
 
-        if session_user == 'Quit':
-            mainLooping = False
-            break
+            if session_user.loginVal == 'Quit':
+                mainLooping = False
+                break
+
+        if session_user.loginVal == "Valid":
+            print("User Logged In: ",session_user.name)
+
+        
 
         # Main 3 Choices
 
@@ -497,7 +512,7 @@ class Main ():
             print()
         if menuChoice == '0':
             mainLooping = False
-            session_user == 'Quit'
+            session_user.loginVal == 'Quit'
             break
         elif menuChoice == '1':
             PlayerMenu(session_user)
