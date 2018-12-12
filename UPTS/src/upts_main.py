@@ -1,8 +1,8 @@
 import requests
 from io import StringIO
 import json
-
-
+import mysql.connector as mysql
+from mysql.connector import errorcode
 import pytest
 import datetime
 import pandas as pd
@@ -12,7 +12,7 @@ import pprint
 import os, sys
 import time
 
-
+from upts_games import * 
 
 # Database Connection Variables
 db_master = 'upts_s1'
@@ -21,198 +21,7 @@ db_user='prog_user'
 db_password='Pr0gpass'
 db_table = ""
 
-class upts_game():
 
-    # Class Variables
-    total_game_count = 0
-    allGames = []
-
-    def __init__(self, game_name='none', game_notes='none', game_currency='none', game_trophies='none', game_ach='none', game_items='none'):
-        print('Initialized Game')
-        self.game_name = game_name
-        self.game_notes = game_notes
-        self.game_currency = game_currency
-        self.game_trophies = game_trophies
-        self.game_ach = game_ach
-        self.game_items = game_items
-
-        self.sql = ""
-        self.val = ""
-        self.cnx = ""
-        self.csr = ""
-        self.games_idgames = ""
-
-        self.total_game_count += 1
-        self.allGames.append(self.game_name)
-
-    def convert_class_to_dict(self):
-        game_name = self.game_name
-        game_notes = self.game_notes
-        game_currency = self.game_currency
-        game_trophies = self.game_trophies
-        game_ach = self.game_ach
-        game_items = self.game_items
-        class_dict = { game_name : [
-            {'game_name' : game_name},
-            {'game_notes' : game_notes},
-            {'game_currency' : game_currency},
-            {'game_trophies' : game_trophies},
-            {'game_ach' : game_ach},
-            {'game_items' : game_items}
-        ]
-        }
-        print (class_dict)
-        return class_dict
-
-    def make_Pandas(self, datadict):
-        dataframe = pd.DataFrame(datadict)
-        print('DataFrame:')
-        print(dataframe)
-        return dataframe
-
-    def save_json_pd(self):
-        print ('Saving game json file')
-        datadict = self.convert_class_to_dict()
-        pd_dataframe = self.make_Pandas(datadict)
-        json_name = "json/" + self.game_name + ".json"
-        with open(json_name, 'w') as f:
-            f.write(pd_dataframe.to_json(orient='records', lines=True))
-
-    def load_json_pd(self):
-        json_name = "json/" + self.game_name + ".json"
-        dataframe = pd.read_json(json_name, orient='records', lines=True)
-        print(dataframe)
-        return dataframe
-
-    # Save each property to their respective databases
-    def save_to_db(self, session_userid):
-        
-        # Use a decorator to open/close database connection
-        def db_con (func):
-            def inner (*args, **kwargs):
-                self.cnx = upts_db.OpenDB()
-                self.csr = self.cnx.cursor()
-
-                try:
-                    func (*args, **kwargs)
-                    
-                except Exception as err:
-                    print("Failed inserting record: {}".format(err))
-                    
-                upts_db.CloseDB(self.cnx)
-
-            return inner
-
-        # Game Name
-        def name_to_db(self):
-            cnx = upts_db.OpenDB()
-            csr = cnx.cursor()
-            try:
-                self.sql = "INSERT INTO `upts_s1`.`games` (`game_name`) VALUES ('"+self.game_name+"');"
-                csr.execute(self.sql)
-                cnx.commit()
-                upts_db.CloseDB(cnx)
-            except Exception as err:
-                    print("Failed inserting record: {}".format(err))
-                    upts_db.CloseDB(cnx)
-
-            # Get games_idgames    
-            cnx = upts_db.OpenDB()
-            csr = cnx.cursor()
-            self.sql = "SELECT * FROM `upts_s1`.`games` WHERE (`game_name`) = '" + self.game_name + "'"
-            csr.execute(self.sql)
-            for (game_name) in csr:
-                self.games_idgames = game_name[0]
-            print (self.games_idgames)
-            upts_db.CloseDB(cnx)
-
-        # Game Notes
-        @db_con
-        def notes_to_db (self):
-            for note in self.game_notes:
-                for key in note :
-                    self.csr = self.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, note[key]))
-                    self.sql = "INSERT INTO notes (gnote_name, gnote_details, games_idgames) VALUES (%s , %s, %s)"
-                    self.val = (key, note[key], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-                    
-        # Currency
-        @db_con
-        def cur_to_db(self):
-            for cur in self.game_currency:
-                for key in cur :
-                    self.csr = self.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, cur[key]))
-                    self.sql = "INSERT INTO currencies (game_currency, currency_note, games_idgames) VALUES (%s , %s, %s)"
-                    self.val = (key, cur[key], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-
-        # Trophies
-        @db_con
-        def trophies_to_db(self):
-            for trophy in self.game_trophies:
-                for key in trophy:
-                    self.csr = self.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, trophy[key]))
-                    self.sql = "INSERT INTO trophies (trophy_name, trophy_description, games_idgames) VALUES (%s , %s, %s)"
-                    self.val = (key, trophy[key], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-
-        # Acheivements
-        @db_con
-        def ach_to_db(self):
-            for achievement in self.game_ach:
-                for key in achievement:
-                    self.csr = self.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, achievement[key]))
-                    self.sql = "INSERT INTO achievements (ach_name, ach_desc, games_idgames) VALUES (%s , %s, %s)"
-                    self.val = (key, achievement[key], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-
-        # Game Items
-        @db_con
-        def items_to_db (self):
-            for item in self.game_items:
-                for key in item:
-                    self.csr = self.cnx.cursor()
-                    print ("key: %s , value: %s, %s, %s" % (key, item[key][0], item[key][1], item[key][2]))
-                    self.sql = "INSERT INTO items (item_name, item_desc, item_cost, cost_unit, games_idgames) VALUES (%s , %s, %s, %s, %s)"
-                    self.val = (key, item[key][0], item[key][1], item[key][2], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-
-        # Register user with games_has_users database
-        @db_con
-        def game_has_user (self, session_userid):
-            print (session_userid , self.games_idgames)
-            if session_userid != "None":
-                csr = self.cnx.cursor()
-                try:
-                    self.sql = "INSERT INTO games_has_users (users_idusers,games_idgames) VALUES (%s , %s)"
-                    self.val = (session_userid , self.games_idgames)
-                    csr.execute(self.sql, self.val)
-                    self.cnx.commit()
-                except Exception as err:
-                        print("Failed inserting record: {}".format(err))
-
-        
-
-
-        name_to_db(self)
-        notes_to_db (self)
-        cur_to_db (self)
-        trophies_to_db (self)
-        ach_to_db (self)
-        items_to_db (self)
-        game_has_user (self, session_userid)
-        
-        print("Game Records Inserted")
-     
 
 class upts_db():
     # Create Database - NOT WORKING YET - Included for Reference
@@ -804,4 +613,23 @@ def MainLoop():
 MainLoop()
 
 
+
+# For testing only
+
+# #getting current file path
+path=os.path.abspath(__file__)
+
+# getting directory name
+fd=os.path.dirname(path)
+# print ('fd = ' + fd)
+
+# Split the current path
+head, tail = os.path.split(fd)
+# print ('head = ' + head)
+
+#going forward one level - add the folder name 'tests'
+testPath=os.path.join(head,'tests')
+
+#adding the path
+sys.path.append(testPath)
 
