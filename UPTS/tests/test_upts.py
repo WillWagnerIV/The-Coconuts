@@ -1,5 +1,6 @@
 import os, sys
 import time
+import pytest
 
 # #getting current file path
 path=os.path.abspath(__file__)
@@ -10,7 +11,7 @@ fd=os.path.dirname(path)
 
 # Split the current path
 head, tail = os.path.split(fd)
-# print ('head = ' + head)
+print ('head = ' + head)
 
 #going forward one level - add the folder name 'src'
 modulePath=os.path.join(head,'src')
@@ -18,8 +19,14 @@ modulePath=os.path.join(head,'src')
 #adding the path
 sys.path.append(modulePath)
 
+from upts_games import upts_game
+# from upts_dbs import upts_db
+# from upts_main import upts_player
+# from upts_main import upts_user
+
 from upts_main import *
-import pytest
+
+
 
 #input output values for account with balance $500
 # input_output = (
@@ -29,7 +36,26 @@ import pytest
 #     (12, 512)
 # )
 
+# TestGame = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
 
+
+
+# Database Connection Variables
+db_master = 'upts_s1'
+db_host = '134.173.236.104'
+db_user='prog_user'
+db_password='Pr0gpass'
+db_table = ""
+
+dt = time.strftime('%d/%m/%Y %H:%M:%S')
+print (dt)
+user_realname = "Test User Name" + dt
+un = "testuser" + dt
+pw = "testpass"
+uid = 0
+player_id = 0
+player_name = "Test Player Name"
+lastrowid = 0
         
 game_name = "Test Game"
 game_notes = [
@@ -75,16 +101,7 @@ testGame_alt_labels = {
     }
 }
 
-# TestGame = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
-dt = time.strftime('%d/%m/%Y %H:%M:%S')
-print (dt)
-user_realname = "Test User Name" + dt
-un = "testuser" + dt
-pw = "testpass"
-uid = 0
-player_id = 0
-player_name = "Test Player Name"
-lastrowid = 0
+
 
 # Test Database Connection
 def test_upts_db():
@@ -92,37 +109,33 @@ def test_upts_db():
     upts_db.CloseDB(x)
     assert "Access denied" not in str(x)
 
-#fixture for creating Objects
-@pytest.fixture()
-def create_objects():
-    a = upts_user ( user_realname, un, pw, uid )
-    b = upts_player ( player_id, player_name)
-    c = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
-    return [a, b, c]
+# #fixture for creating Objects
+# @pytest.fixture()
+# def create_objects():
+#     a = upts_user ( user_realname, un, pw, uid )
+#     b = upts_player ( player_id, player_name)
+#     c = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
+#     return [a, b, c]
 
-#test creating objects
-def test_creating_objects(create_objects):
-    assert create_objects[0].name == user_realname
-    assert create_objects[1].player_name == player_name
-    assert create_objects[2].game_name == game_name
+# #test creating objects
+# def test_creating_objects(create_objects):
+#     assert create_objects[0].name == user_realname
+#     assert create_objects[1].player_name == player_name
+#     assert create_objects[2].game_name == game_name
 
 
 
 
 #parametrized tests for Adding new User to DB
-@pytest.mark.parametrize("uname",
-                            [
-                            pytest.param(un, marks=pytest.mark.xpass(reason="Username is unique")),
-                            pytest.param("testuser", marks=pytest.mark.xfail(reason="Username must be unique"))
-                            ]
-)
+@pytest.mark.parametrize("uname",[ pytest.param(un, marks=pytest.mark.xpass(reason="Username is unique")), 
+                                   pytest.param("testuser", marks=pytest.mark.xfail(reason="Username must be unique"))  ])
 def test_advanced_AddUser(uname):
     lastrowid = upts_user.AddUser(uname, pw)
     assert lastrowid != 0
 
 
 
-# # Test for adding player
+# Test for adding player
 # @pytest.mark.parametrize("uname",
 #                             [
 #                             pytest.param(un, marks=pytest.mark.xpass(reason="Username is unique")),
@@ -178,7 +191,7 @@ def test_advanced_AddUser(uname):
 #                             [
 #                             (20, 520),
 #                             (30, 530),
-#                             pytest.param(-35,465, marks=pytest.mark.xfail(reason="Deposit of negative amount should be disallowed")),
+#                             pytest.param(-35,465, marks=pytest.mark.xpassl(reason="Deposit of negative amount should be disallowed")),
 #                             pytest.param(10, 512, marks=pytest.mark.xfail(reason="Deposit of $10 on $500 balance must not give a balance of $512"))
 #                             ]
 # )
