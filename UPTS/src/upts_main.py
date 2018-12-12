@@ -12,7 +12,8 @@ import pprint
 import os, sys
 import time
 
-from upts_games import * 
+from upts_games import upts_game 
+from upts_dbs import upts_db 
 
 # Database Connection Variables
 db_master = 'upts_s1'
@@ -20,107 +21,6 @@ db_host = '134.173.236.104'
 db_user='prog_user'
 db_password='Pr0gpass'
 db_table = ""
-
-
-
-class upts_db():
-    # Create Database - NOT WORKING YET - Included for Reference
-    def create_database(cursor):
-        try:
-            cursor.execute(
-                "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(db_master))
-        except mysql.connector.Error as err:
-            print("Failed creating database: {}".format(err))
-            exit(1)
-
-        try:
-            cursor.execute("USE {}".format(db_master))
-        except mysql.connector.Error as err:
-            print("Database {} does not exists.".format(db_master))
-            if err.errno == errorcode.ER_BAD_DB_ERROR:
-                create_database(cursor)
-                print("Database {} created successfully.".format(db_master))
-                cnx.database = db_master
-            else:
-                print(err)
-                exit(1)
-
-
-    # Open Database Connection and Print Confirmation
-    # If there's an Error, Report Error then Close Connection
-    def open_test_close():
-        try:
-            cnx = mysql.connect(user=db_user, password=db_password,
-                                        host=db_host,
-                                        database=db_master)
-            print ('Connection Opened')
-        except mysql.Error as err:
-            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Something is wrong with your user name or password")
-            elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                print("Database does not exist")
-            else:
-                print(err)
-        else:
-            cnx.close()
-            print ('Connection Closed')
-
-
-    # Open Database Connection or Report Error - Does not Close Connection
-    def OpenDB():
-        try:
-            cnx = mysql.connect(user=db_user, password=db_password,
-                                        host=db_host,
-                                        database=db_master)
-            # print('Connection Opened: ' + str(cnx))
-            return cnx
-        except mysql.Error as err:
-            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Something is wrong with Database user name or password")
-                return err
-            elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                print("Database does not exist")
-                return err
-            else:
-                print(err)
-                return err
-
-
-    # Close Database Connection
-    def CloseDB(cnx):
-        # print ('should be closing')
-        # c = cnx.cursor()
-        # c.close()
-        # cnx.close()
-        # if cnx.close() == None:
-        #      print('Connection Closed')
-        return cnx
-
-    # ----------  START DATABASE TABLE FUNCTIONS
-
-    # Create a Table - Pass table_columns as a list
-    def createTable(cnx,db_table,table_columns):
-        c = cnx.cursor()
-        colCount = 0
-        try:
-            # Create table
-            print (table_columns)
-            sqlStatement = 'CREATE TABLE '+ db_table + ' ('
-            for col_Name in table_columns:
-                sqlStatement += col_Name
-                if colCount < len (table_columns) - 1:
-                    sqlStatement += ', '
-                    colCount += 1
-            sqlStatement += ')'
-            print ('sql statement: ' + str(sqlStatement))
-
-            c.execute(sqlStatement)
-            cnx.commit()
-            print('created ' + db_table + ' table')
-
-        except Exception as identifier:
-            print(str(identifier))
-            # dropTable(cnx, 'users')
 
 
 class upts_user():
@@ -396,40 +296,44 @@ class Temporary_json_funcs:
                     "pandas_version": "0.20.0"},
             "data": [{"index": "row 1", "Player Key": "36","Player Name": "A Player Name","col 1": "a", "col 2": "b", "User": "A User Name"}]}
 
+class Main ():
 
-#  Login Menu
-def LoginMenu():
-    loggingIn = True
-    # cnx = OpenDB()
-    # cursor = cnx.cursor()
+    def __init__(self):
+        pass
 
-    while (loggingIn):
-        print()
-        print('       ###   Login Menu   ###')
-        print()
-        print(' 1 - Sign In')
-        print(' 2 - New User')
-        print(' 3 - Recover Credentials')
-        print(' 0 - Quit')
-        print()
+            
+    #  Login Menu
+    def LoginMenu():
+        loggingIn = True
+        # cnx = OpenDB()
+        # cursor = cnx.cursor()
 
-        menuChoice = input(' Selection: ')
-
-        if menuChoice in ("1", "2", "3"):
+        while (loggingIn):
+            print()
+            print('       ###   Login Menu   ###')
+            print()
+            print(' 1 - Sign In')
+            print(' 2 - New User')
+            print(' 3 - Recover Credentials')
+            print(' 0 - Quit')
             print()
 
-        if menuChoice == '0':
-            loggingIn = False
-            return "Quit"
+            menuChoice = input(' Selection: ')
 
-        elif menuChoice == '1':
-            try:
-                aUser, aPass = input(
-                    "Enter Username and Password (Username, Password): ").split(',')
-            except:
-                print("Invalid input.  Please try again. ",sys.exc_info()[0],"occured.")
+            if menuChoice in ("1", "2", "3"):
+                print()
 
-            try:
+            if menuChoice == '0':
+                loggingIn = False
+                return "Quit"
+
+            elif menuChoice == '1':
+                try:
+                    aUser, aPass = input( "Enter Username and Password (Username, Password): ").split(',')
+                except:
+                    print("Invalid input.  Please try again. ",sys.exc_info()[0],"occured.")
+
+                # try:
                 session_user = upts_user.SignIn(aUser, aPass)
                 if session_user.loginVal == None:
                     # print ('none : ' + session_user.user_name)
@@ -439,129 +343,128 @@ def LoginMenu():
                     loggingIn = False
                     return session_user
 
-            except:
-                print("Oops!",sys.exc_info()[0],"occured.")
-            
+                # except:
+                    # print("Login System Oops!",sys.exc_info()[0],"occured.")
+                
 
-        elif menuChoice == '2':
-            try:
-                print ('PASSWORD IS NOT ENCRYPTED OR SECURE!')
-                print ('PASSWORD WILL BE VISIBLE!')
-                print ("ONLY USE A TEMPORARY TEST PASSWORD YOU DON'T CARE IF ANYONE SEES!")
-                aUser, aPass = input("Enter new Username and Password (Username, Password): ").split(',')
-                print ('Should add user')
-                upts_user.AddUser(aUser, aPass)
+            elif menuChoice == '2':
+                try:
+                    print ('PASSWORD IS NOT ENCRYPTED OR SECURE!')
+                    print ('PASSWORD WILL BE VISIBLE!')
+                    print ("ONLY USE A TEMPORARY TEST PASSWORD YOU DON'T CARE IF ANYONE SEES!")
+                    aUser, aPass = input("Enter new Username and Password (Username, Password): ").split(',')
+                    print ('Should add user')
+                    upts_user.AddUser(aUser, aPass)
 
-            except:
-                print("Oops!",sys.exc_info()[0],"occured.")
+                except:
+                    print("Oops!",sys.exc_info()[0],"occured.")
 
-        elif menuChoice == '3':
-            upts_user.UserRecover()
+            elif menuChoice == '3':
+                upts_user.UserRecover()
 
-        elif menuChoice == '4':
-            upts_user.GetUsers()
+            elif menuChoice == '4':
+                upts_user.GetUsers()
 
-        else:
+            else:
+                print()
+                print('Please choose one of the options above.')
+                print()
+
+    #  Player Menu
+    def PlayerMenu(session_user):
+        PlayerMenuing = True
+
+        while (PlayerMenuing):
             print()
-            print('Please choose one of the options above.')
+            print('       ###   Player Menu   ###')
             print()
-
-#  Player Menu
-def PlayerMenu(session_user):
-    PlayerMenuing = True
-
-    while (PlayerMenuing):
-        print()
-        print('       ###   Player Menu   ###')
-        print()
-        print(' 1 - List My Players')
-        print(' 2 - Add a Player')
-        print(' 3 - Remove a Player')
-        print(' 0 - Return to Main Menu')
-        print()
-
-        menuChoice = input(' Selection: ')
-
-        if menuChoice in ("1", "2", "3", "4"):
+            print(' 1 - List My Players')
+            print(' 2 - Add a Player')
+            print(' 3 - Remove a Player')
+            print(' 0 - Return to Main Menu')
             print()
 
-        if menuChoice == '0':                               # Main Menu
-            PlayerMenuing = False
-            break
+            menuChoice = input(' Selection: ')
 
-        elif menuChoice == '1':                             # List Players
-            upts_player.GetPlayers(session_user.uid)
+            if menuChoice in ("1", "2", "3", "4"):
+                print()
 
-        elif menuChoice == '2':                             # Add a Player
-            aName = input(
-                "Enter new Player Name: ")
-            upts_player.AddPlayer(session_user.uid, aName)
+            if menuChoice == '0':                               # Main Menu
+                PlayerMenuing = False
+                break
 
-        elif menuChoice == '3':                             # Remove a Player
-            print ('Player Key | Player Information')
-            players_list = upts_player.GetPlayers(session_user.uid)
-            pk = int(input ('Enter Player Key: '))
-            for player in players_list:
-                if int(pk) == player.player_id:
-                    print ('Are you sure you want to remove: ' + str(player.player_name))
-                    double_check = input (' Enter y to Confirm Delete - There is no reversing this action!')
-                    if double_check == 'y':
-                        upts_player.removePlayer (player.player_id)
+            elif menuChoice == '1':                             # List Players
+                upts_player.GetPlayers(session_user.uid)
 
-        # elif menuChoice == '4':                             # Edit a Player
-        #     print('Edit a Player')
+            elif menuChoice == '2':                             # Add a Player
+                aName = input(
+                    "Enter new Player Name: ")
+                upts_player.AddPlayer(session_user.uid, aName)
 
-        else:
+            elif menuChoice == '3':                             # Remove a Player
+                print ('Player Key | Player Information')
+                players_list = upts_player.GetPlayers(session_user.uid)
+                pk = int(input ('Enter Player Key: '))
+                for player in players_list:
+                    if int(pk) == player.player_id:
+                        print ('Are you sure you want to remove: ' + str(player.player_name))
+                        double_check = input (' Enter y to Confirm Delete - There is no reversing this action!')
+                        if double_check == 'y':
+                            upts_player.removePlayer (player.player_id)
+
+            # elif menuChoice == '4':                             # Edit a Player
+            #     print('Edit a Player')
+
+            else:
+                print()
+                print('Please choose one of the options above.')
+                print()
+
+    #  Games Menu
+    def GamesMenu(session_user):
+        GamesMenuing = True
+
+        while (GamesMenuing):
             print()
-            print('Please choose one of the options above.')
+            print('       ###   Games Menu   ###')
             print()
+            print(' 1 - List My Games')
+            print(' 2 - Add a Game')
+            print(' 3 - Remove a Game')
+            print(' 0 - Return to Main Menu')
+            print()       
 
-#  Games Menu
-def GamesMenu(session_user):
-    GamesMenuing = True
+            menuChoice = input(' Selection: ')
 
-    while (GamesMenuing):
-        print()
-        print('       ###   Games Menu   ###')
-        print()
-        print(' 1 - List My Games')
-        print(' 2 - Add a Game')
-        print(' 3 - Remove a Game')
-        print(' 0 - Return to Main Menu')
-        print()       
+            if menuChoice in ("0","1", "2", "3"):
+                print()
 
-        menuChoice = input(' Selection: ')
+            if menuChoice == '0':                               # Main Menu
+                GamesMenuing = False
+                break
 
-        if menuChoice in ("0","1", "2", "3"):
-            print()
+            elif menuChoice == '1':                             # List Games
+                upts_user.Load_games_from_db(session_user)
 
-        if menuChoice == '0':                               # Main Menu
-            GamesMenuing = False
-            break
+            elif menuChoice == '2':                             # Add a Game
+                upts_report.list_all_games()
+                gameID = input("Enter Game ID: ")
+                # upts_game.....
 
-        elif menuChoice == '1':                             # List Games
-            upts_user.Load_games_from_db(session_user)
-
-        elif menuChoice == '2':                             # Add a Game
-            upts_report.list_all_games()
-            gameID = input("Enter Game ID: ")
-            # upts_game.....
-
-        elif menuChoice == '3':                             # Remove Game
-            upts_player.GetPlayers(session_user.uid)
+            elif menuChoice == '3':                             # Remove Game
+                upts_player.GetPlayers(session_user.uid)
 
 
-        else:
-            print()
-            print('Please choose one of the options above.')
-            print()
+            else:
+                print()
+                print('Please choose one of the options above.')
+                print()
 
-#  Reports and Admin Menu
-def ReportsMenu(session_user):
-    pass
+    #  Reports and Admin Menu
+    def ReportsMenu(session_user):
+        pass
 
-#  Main Loop
-def MainLoop():
+    #  Main Loop
     mainLooping = True
     session_user = "None"
 
@@ -610,7 +513,6 @@ def MainLoop():
             print('Please choose one of the options above.')
             print()
 
-MainLoop()
 
 
 

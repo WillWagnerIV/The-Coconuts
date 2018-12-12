@@ -11,7 +11,7 @@ fd=os.path.dirname(path)
 
 # Split the current path
 head, tail = os.path.split(fd)
-# print ('head = ' + head)
+print ('head = ' + head)
 
 #going forward one level - add the folder name 'src'
 modulePath=os.path.join(head,'src')
@@ -19,8 +19,14 @@ modulePath=os.path.join(head,'src')
 #adding the path
 sys.path.append(modulePath)
 
-from upts_main import upts_db,upts_player,upts_user
 from upts_games import upts_game
+# from upts_dbs import upts_db
+# from upts_main import upts_player
+# from upts_main import upts_user
+
+from upts_main import *
+
+
 
 #input output values for account with balance $500
 # input_output = (
@@ -31,6 +37,16 @@ from upts_games import upts_game
 # )
 
 # TestGame = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
+
+
+
+# Database Connection Variables
+db_master = 'upts_s1'
+db_host = '134.173.236.104'
+db_user='prog_user'
+db_password='Pr0gpass'
+db_table = ""
+
 dt = time.strftime('%d/%m/%Y %H:%M:%S')
 print (dt)
 user_realname = "Test User Name" + dt
@@ -93,19 +109,19 @@ def test_upts_db():
     upts_db.CloseDB(x)
     assert "Access denied" not in str(x)
 
-#fixture for creating Objects
-@pytest.fixture()
-def create_objects():
-    a = upts_user ( user_realname, un, pw, uid )
-    b = upts_player ( player_id, player_name)
-    c = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
-    return [a, b, c]
+# #fixture for creating Objects
+# @pytest.fixture()
+# def create_objects():
+#     a = upts_user ( user_realname, un, pw, uid )
+#     b = upts_player ( player_id, player_name)
+#     c = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
+#     return [a, b, c]
 
-#test creating objects
-def test_creating_objects(create_objects):
-    assert create_objects[0].name == user_realname
-    assert create_objects[1].player_name == player_name
-    assert create_objects[2].game_name == game_name
+# #test creating objects
+# def test_creating_objects(create_objects):
+#     assert create_objects[0].name == user_realname
+#     assert create_objects[1].player_name == player_name
+#     assert create_objects[2].game_name == game_name
 
 
 
@@ -119,7 +135,7 @@ def test_advanced_AddUser(uname):
 
 
 
-# # Test for adding player
+# Test for adding player
 # @pytest.mark.parametrize("uname",
 #                             [
 #                             pytest.param(un, marks=pytest.mark.xpass(reason="Username is unique")),
