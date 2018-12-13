@@ -506,6 +506,7 @@ class Main ():
                 # convert dataframe to class
                 game_name = df_to_list[0]['game_name']
                 game_notes = df_to_list[1]['game_notes']
+                print (game_notes)
                 game_currency = df_to_list[2]['game_currency']
                 game_trophies = df_to_list[3]['game_trophies']
                 game_ach = df_to_list[4]['game_ach']

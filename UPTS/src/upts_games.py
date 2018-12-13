@@ -64,8 +64,8 @@ class upts_game():
             f.write(pd_dataframe.to_json(orient='records', lines=True))
 
     def load_json_pd(self):
-        print (self.game_name)
-        print ('Big Chugga')
+        # print (self.game_name)
+        # print ('Big Chugga')
         # print (str (jsonpath))
         # json_name = jsonpath + self.game_name + ".json"
         # print ('JSON NAME:')
@@ -88,9 +88,6 @@ class upts_game():
         
         # Use a decorator to open/close database connection
         def db_con (func):
-           
-            
-            print ('running db_con')
 
             # Runs the passed function or captures and returns the error
             def inner (*args, **kwargs):
@@ -143,31 +140,31 @@ class upts_game():
                     sql = "INSERT INTO notes (gnote_name, gnote_details, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, note[key], self.games_idgames)
                     csr.execute(sql, val)
-                    self.cnx.commit()
+                    upts_db.cnx.commit()
                     
         # Currency
         @db_con
         def cur_to_db(self):
             for cur in self.game_currency:
                 for key in cur :
-                    self.csr = self.cnx.cursor()
+                    csr = upts_db.cnx.cursor()
                     print ("key: %s , value: %s" % (key, cur[key]))
-                    self.sql = "INSERT INTO currencies (game_currency, currency_note, games_idgames) VALUES (%s , %s, %s)"
-                    self.val = (key, cur[key], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
+                    sql = "INSERT INTO currencies (game_currency, currency_note, games_idgames) VALUES (%s , %s, %s)"
+                    val = (key, cur[key], self.games_idgames)
+                    csr.execute(sql,val)
+                    upts_db.cnx.commit()
 
         # Trophies
         @db_con
         def trophies_to_db(self):
             for trophy in self.game_trophies:
                 for key in trophy:
-                    self.csr = self.cnx.cursor()
+                    csr = upts_db.cnx.cursor()
                     print ("key: %s , value: %s" % (key, trophy[key]))
-                    self.sql = "INSERT INTO trophies (trophy_name, trophy_description, games_idgames) VALUES (%s , %s, %s)"
-                    self.val = (key, trophy[key], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
-                    self.cnx.commit()
+                    sql = "INSERT INTO trophies (trophy_name, trophy_description, games_idgames) VALUES (%s , %s, %s)"
+                    val = (key, trophy[key], self.games_idgames)
+                    csr.execute(self.sql, self.val)
+                    upts_db.cnx.commit()
 
         # Acheivements
         @db_con
