@@ -1,3 +1,9 @@
+from os import walk
+import pandas as pd
+from pandas.io.json import json_normalize
+
+from upts_dbs import upts_db
+
 class upts_game():
 
     # Class Variables
@@ -18,6 +24,8 @@ class upts_game():
         self.cnx = ""
         self.csr = ""
         self.games_idgames = ""
+
+        self.pd_structure = ""
 
         self.total_game_count += 1
         self.allGames.append(self.game_name)
@@ -51,32 +59,54 @@ class upts_game():
         print ('Saving game json file')
         datadict = self.convert_class_to_dict()
         pd_dataframe = self.make_Pandas(datadict)
-        json_name = "json/" + self.game_name + ".json"
+        json_name = jsonpath + self.game_name + ".json"
         with open(json_name, 'w') as f:
             f.write(pd_dataframe.to_json(orient='records', lines=True))
 
     def load_json_pd(self):
-        json_name = "json/" + self.game_name + ".json"
-        dataframe = pd.read_json(json_name, orient='records', lines=True)
-        print(dataframe)
-        return dataframe
+        print (self.game_name)
+        print ('Big Chugga')
+        # print (str (jsonpath))
+        # json_name = jsonpath + self.game_name + ".json"
+        # print ('JSON NAME:')
+        # print (json_name)
+        # dataframe = pd.read_json(json_name, orient='records', lines=True)
+        # print(dataframe)
+        # return dataframe
+
+    def pfunk ():
+        print ('Pfunk stepped on!')
+
+    def json_files (self, json_path):
+        filelist = []
+        for (dirpath, dirnames, filenames) in walk(json_path):
+            self.filelist.extend(filenames)
+        return filelist
 
     # Save each property to their respective databases
     def save_to_db(self, session_userid):
         
         # Use a decorator to open/close database connection
         def db_con (func):
-            def inner (*args, **kwargs):
-                self.cnx = upts_db.OpenDB()
-                self.csr = self.cnx.cursor()
+           
+            
+            print ('running db_con')
 
-                try:
-                    func (*args, **kwargs)
+            # Runs the passed function or captures and returns the error
+            def inner (*args, **kwargs):
+
+                # Build
+                upts_db.cnx = upts_db.OpenDB()
+                upts_db.cursor = upts_db.cnx.cursor()
+        
+                # try:
+                func ( *args, **kwargs)
                     
-                except Exception as err:
-                    print("Failed inserting record: {}".format(err))
-                    
-                upts_db.CloseDB(self.cnx)
+                # except Exception as err:
+                #     print("Failed accessing record: {}".format(err))
+
+                #     # Teardown    
+                #     upts_db.CloseDB(upts_db.cnx)
 
             return inner
 
@@ -108,11 +138,11 @@ class upts_game():
         def notes_to_db (self):
             for note in self.game_notes:
                 for key in note :
-                    self.csr = self.cnx.cursor()
+                    csr = upts_db.cnx.cursor()
                     print ("key: %s , value: %s" % (key, note[key]))
-                    self.sql = "INSERT INTO notes (gnote_name, gnote_details, games_idgames) VALUES (%s , %s, %s)"
-                    self.val = (key, note[key], self.games_idgames)
-                    self.csr.execute(self.sql, self.val)
+                    sql = "INSERT INTO notes (gnote_name, gnote_details, games_idgames) VALUES (%s , %s, %s)"
+                    val = (key, note[key], self.games_idgames)
+                    csr.execute(sql, val)
                     self.cnx.commit()
                     
         # Currency
@@ -189,4 +219,3 @@ class upts_game():
         game_has_user (self, session_userid)
         
         print("Game Records Inserted")
-     

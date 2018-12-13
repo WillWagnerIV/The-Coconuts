@@ -10,10 +10,34 @@ from pandas.io.json import json_normalize
 import numpy as np
 import pprint
 import os, sys
+from os import walk
 import time
 
+# #getting current file path
+path=os.path.abspath(__file__)
+
+# getting directory name
+fd=os.path.dirname(path)
+# print ('fd = ' + fd)
+
+# Split the current path
+head, tail = os.path.split(fd)
+# print ('head = ' + head)
+
+#going forward one level - add the folders
+testPath=os.path.join(head,'tests/')
+srcpath=os.path.join(head,'src/')
+jsonpath=os.path.join(head,'json/')
+
+#adding the path
+sys.path.append(testPath)
+sys.path.append(srcpath)
+sys.path.append(jsonpath)
+
 from upts_games import upts_game 
-from upts_dbs import upts_db 
+from upts_dbs import upts_db
+import upts_reports as urep
+
 
 # Database Connection Variables
 db_master = 'upts_s1'
@@ -67,7 +91,7 @@ class upts_user():
         cnx = upts_db.OpenDB()
         cursor = cnx.cursor()
         sql = 'SELECT * FROM users WHERE username = "' + un + '"'
-        print (sql)
+        # print (sql)
         cursor.execute(sql)
         for response in cursor:
             if response[2] == pw:
@@ -149,35 +173,6 @@ class upts_player():
         cnx.commit()
         print("1 record removed.")
         upts_db.CloseDB(cnx)
-
-
-class upts_report():
-
-    def __init__(self):
-        print('\n')
-
-    # Use a decorator to open/close database connection
-    def db_con (func):
-        def inner (*args, **kwargs):
-            upts_db.cnx = upts_db.OpenDB()
-            upts_db.cursor = upts_db.cnx.cursor()
-
-            try:
-                func ( *args, **kwargs)
-                
-            except Exception as err:
-                print("Failed accessing record: {}".format(err))
-                
-            upts_db.CloseDB(upts_db.cnx)
-
-        return inner
-
-    @db_con
-    def list_all_games (self):
-        query = ("SELECT * FROM games")
-        upts_db.cursor.execute(query)
-        for (game_name) in upts_db.cursor:
-            print("{}".format(game_name))
 
 
 class Temporary_Game_Functions():
@@ -303,7 +298,6 @@ class Main ():
 
     def __init__(self):
         pass
-
             
     #  Login Menu
     def LoginMenu():
@@ -335,7 +329,9 @@ class Main ():
                 try:
                     aUser, aPass = input( "Enter Username and Password (Username, Password): ").split(',')
                 except:
-                    print("Invalid input.  Please try again. ",sys.exc_info()[0],"occured.")
+                    # print("Invalid input.  Please try again. ",sys.exc_info()[0],"occured.")
+                    print("Invalid input.  Please try again. ")
+
 
                 try:
                     session_user = upts_user.SignIn(aUser, aPass)
@@ -354,7 +350,8 @@ class Main ():
                         return session_user
 
                 except:
-                    print("Login System Oops!",sys.exc_info()[0],"occured.")
+                    pass
+                    # print("Login System Oops!",sys.exc_info()[0],"occured.")
                 
 
             elif menuChoice == '2':
@@ -438,9 +435,10 @@ class Main ():
             print()
             print('       ###   Games Menu   ###')
             print()
-            print(' 1 - List My Games')
-            print(' 2 - Add a Game')
-            print(' 3 - Remove a Game')
+            print(" 1 - List All User's Games from DB")
+            print(" 2 - List Contents of json directory")
+            print(' 3 - Import a Game(s) from .json')
+            print(' 4 - Remove a Game from DB')
             print(' 0 - Return to Main Menu')
             print()       
 
@@ -456,7 +454,119 @@ class Main ():
             elif menuChoice == '1':                             # List Games
                 upts_user.Load_games_from_db(session_user)
 
-            elif menuChoice == '2':                             # Add a Game
+            elif menuChoice == '2':                             # list json files
+
+                filelist = []
+                index = 0                                   
+                for (dirpath, dirnames, filenames) in walk(jsonpath):
+                    filelist.extend(filenames)
+                    
+                for filename in filelist:
+                    gn = filename[:-5] 
+                    temp_game = upts_game (game_name=gn)
+                    print("{0}   {1}".format(index, temp_game.game_name))
+                    index += 1
+
+            elif menuChoice == '3':                             # Import json file
+
+                filelist = []
+                gameslist = []
+                index = 0                                   
+                for (dirpath, dirnames, filenames) in walk(jsonpath):
+                    filelist.extend(filenames)
+                    
+                for filename in filelist:
+                    gn = filename[:-5] 
+                    temp_game = upts_game (game_name=gn)
+                    print("{0}   {1}".format(index, temp_game.game_name))
+                    gameslist.append(temp_game)
+                    index += 1
+
+                file_choice = int (input ('Enter Index to Import: '))
+                filename = filelist[file_choice]
+                gamename = gameslist[file_choice]
+                print (filename)
+                print (gamename.game_name)
+                print (jsonpath)
+                
+                json_name = jsonpath + gamename.game_name + ".json"
+                print ('JSON NAME:')
+                print (json_name)
+                dataframe = pd.read_json(json_name, orient='records', lines=True)
+                
+                print ('returned dataframe')
+                print(dataframe)
+
+                # create the game then save to db
+                print ('dataframe[gamename.game_name]')
+                print (dataframe[gamename.game_name].tolist())
+
+                df_to_list = dataframe[gamename.game_name].tolist()
+
+                # convert dataframe to class
+                game_name = df_to_list[0]['game_name']
+                game_notes = df_to_list[1]['game_notes']
+                game_currency = df_to_list[2]['game_currency']
+                game_trophies = df_to_list[3]['game_trophies']
+                game_ach = df_to_list[4]['game_ach']
+                game_items = df_to_list[5]['game_items']
+
+                # class_dict = { game_name : [
+                #             {'game_name' : game_name},
+                #             {'game_notes' : game_notes},
+                #             {'game_currency' : game_currency},
+                #             {'game_trophies' : game_trophies},
+                #             {'game_ach' : game_ach},
+                #             {'game_items' : game_items}
+                
+                
+                
+                imported_game = upts_game (game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
+
+                imported_game.save_to_db(int(session_user.uid))
+
+            elif menuChoice == '8':                             # List Players
+                upts_player.GetPlayers(session_user.uid)
+
+
+            else:
+                print()
+                print('Please choose one of the options above.')
+                print()
+
+    #  Reports and Admin Menu
+    def ReportsMenu(session_user):
+        reportsmenuing = True
+
+        while (reportsmenuing):
+            print()
+            print('       ###   Reports Menu   ###')
+            print()
+            print(" 1 - List All User's Games")
+            print(' 2 - Import a Game from .json')
+            print(' 3 - Remove a Game')
+            print(' 9 - Return to Main Menu')
+            print(' 0 - Quit')
+            print()       
+
+            menuChoice = input(' Selection: ')
+
+            if menuChoice in ("0","1", "2", "3", "4"):
+                print()
+
+            if menuChoice == '9':                               # Main Menu
+                GamesMenuing = False
+                break
+
+            if menuChoice == '0':                               # Quit
+                GamesMenuing = False
+                session_user.loginVal = "Quit"
+                break                
+
+            elif menuChoice == '1':                             # List Games
+                upts_user.Load_games_from_db(session_user)
+
+            elif menuChoice == '2':                             # Import a Game
                 upts_report.list_all_games()
                 gameID = input("Enter Game ID: ")
                 # upts_game.....
@@ -469,11 +579,6 @@ class Main ():
                 print()
                 print('Please choose one of the options above.')
                 print()
-
-    #  Reports and Admin Menu
-    def ReportsMenu(session_user):
-        pass
-
     #  Main Loop
     mainLooping = True
     session_user = upts_user()
@@ -491,10 +596,15 @@ class Main ():
                 mainLooping = False
                 break
 
-        if session_user.loginVal == "Valid":
-            print("User Logged In: ",session_user.name)
+            if session_user.loginVal == "Valid":
+                print("User Logged In: ",session_user.name)
+                break
 
         
+        if session_user.loginVal == 'Quit':
+                mainLooping = False
+                break
+
 
         # Main 3 Choices
 
@@ -527,26 +637,3 @@ class Main ():
             print()
             print('Please choose one of the options above.')
             print()
-
-
-
-
-# For testing only
-
-# #getting current file path
-path=os.path.abspath(__file__)
-
-# getting directory name
-fd=os.path.dirname(path)
-# print ('fd = ' + fd)
-
-# Split the current path
-head, tail = os.path.split(fd)
-# print ('head = ' + head)
-
-#going forward one level - add the folder name 'tests'
-testPath=os.path.join(head,'tests')
-
-#adding the path
-sys.path.append(testPath)
-
