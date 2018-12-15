@@ -1,7 +1,7 @@
 import sys
 from os import walk
 
-import upts_users, upts_players, upts_games
+import upts_users, upts_players, upts_games, upts_json
 
 #  Login Menu
 def LoginMenu (session_user):
@@ -167,24 +167,27 @@ def GamesMenu(session_user, jsonpath):
 
         elif menuChoice == '2':                             # list json files
 
-            filelist = []
-            index = 0                                   
-            for (dirpath, dirnames, filenames) in walk(jsonpath):
-                    filelist.extend(filenames)
-            
-            jsonlist = [] 
-            for filename in filelist:
-                # print (filename[-5:])
-                if filename[-5:] == ".json":
-                    jsonlist.append (filename)
-                    gn = filename[:-5]
-                    temp_game = upts_games.upts_game (game_name=gn)
-                    print("{0}   {1}".format(index, temp_game.game_name))
-                    index += 1
+            print("{0}   {1}".format("Index", "Game Name"))
+            jsonlist = upts_json.list_json(jsonpath)
+            index = 0
+            for jsongame in jsonlist:
+                print("{0}   {1}".format(index, jsongame.game_name ))
+                index += 1
 
         elif menuChoice == '3':                             # Import json file
-
-            imported_game = upts_games.load_json_pd(jsonpath)
+            
+            print("{0}   {1}".format("Index", "Game Name"))
+            jsonlist = upts_json.list_json(jsonpath)
+            index = 0
+            for jsongame in jsonlist:
+                print("{0}   {1}".format(index, jsongame.game_name ))
+                index += 1
+            
+            sel = int (input ('Enter index to Import: '))
+            imported_game = jsonlist[sel]
+            print (imported_game.game_name)
+            imported_game = imported_game.load_json_pd(jsonpath)
+            print ('Imported: ' + str (imported_game.game_notes))
 
         elif menuChoice == '8':                             # List Players
             upts_players.GetPlayers(session_user)

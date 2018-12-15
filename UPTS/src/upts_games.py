@@ -2,6 +2,7 @@ from os import walk
 
 import pandas as pd
 from pandas.io.json import json_normalize
+import numpy
 
 import upts_dbs as upts_db
 
@@ -67,39 +68,22 @@ class upts_game():
 
     def load_json_pd(self, jsonpath):
         
-        filelist = []
-        gameslist = []
-        index = 0                                   
-        for (dirpath, dirnames, filenames) in walk(jsonpath):
-            filelist.extend(filenames)
-            
-        for filename in filelist:
-            gn = filename[:-5] 
-            temp_game = upts_game (game_name=gn)
-            print("{0}   {1}".format(index, temp_game.game_name))
-            gameslist.append(temp_game)
-            index += 1
-
-        file_choice = int (input ('Enter Index to Import: '))
-        filename = filelist[file_choice]
-        gamename = gameslist[file_choice]
-        print (filename)
-        print (gamename.game_name)
-        print (jsonpath)
-        
-        json_name = jsonpath + gamename.game_name + ".json"
+        json_name = jsonpath + self.game_name + ".json"
         print ('JSON NAME:')
         print (json_name)
         dataframe = pd.read_json(json_name, orient='records', lines=True)
         
+        print ()
         print ('returned dataframe')
         print(dataframe)
+        print()
 
         # create the game then save to db
         print ('dataframe[gamename.game_name]')
-        print (dataframe[gamename.game_name].tolist())
+        print (dataframe[self.game_name].tolist())
 
-        df_to_list = dataframe[gamename.game_name].tolist()
+        df_to_list = dataframe[self.game_name].tolist()
+        print (df_to_list)
 
         return dataframe
       
