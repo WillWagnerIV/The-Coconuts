@@ -52,7 +52,6 @@ def OpenDB():
             print(err)
             return err
 
-
 # Close Database Connection
 def CloseDB(cnx):
     # print ('should be closing')
