@@ -1,3 +1,6 @@
+import upts_dbs as upts_db
+
+
 def GetUsers():
 
     cnx = upts_db.OpenDB()
@@ -22,9 +25,13 @@ def AddUser(un, pw):
 
 def SignIn(un, pw):
 
-    print ('2 Starting sign in function')
 
-    print('Trying to Validate')
+
+    print ('10 Starting sign in function')
+
+
+
+    # print('Trying to Validate')
     cnx = upts_db.OpenDB()
     cursor = cnx.cursor()
     sql = 'SELECT * FROM users WHERE username = "' + un + '"'
@@ -47,7 +54,9 @@ def SignIn(un, pw):
 
 def UserRecover():
 
+    print()
     print('This is where the screens to assist with credentials would go.')
+    print ()
 
 def Load_games_from_db (upts_user):
 
@@ -75,7 +84,7 @@ class upts_user():
     # Class Variables
     total_user_count = 0
     allUsers = []
-    
+
     def __init__(self, name = "Default User Name", un = "username", pw = "password", uid = 0, loginVal = "Not Valid"):
 
         self.name = name
@@ -83,4 +92,3 @@ class upts_user():
         self.pw = pw
         self.uid = uid
         self.loginVal = "Not Valid"
-        

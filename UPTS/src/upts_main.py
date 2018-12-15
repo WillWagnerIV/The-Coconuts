@@ -13,13 +13,13 @@ import os, sys
 from os import walk
 import time
 
+
 # #getting current file path
 path=os.path.abspath(__file__)
 
 # getting directory name
 fd=os.path.dirname(path)
 # print ('fd = ' + fd)
-
 # Split the current path
 head, tail = os.path.split(fd)
 # print ('head = ' + head)
