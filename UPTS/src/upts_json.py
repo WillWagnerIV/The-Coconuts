@@ -20,3 +20,4 @@ def list_json(jsonpath):
             jsonlist.append(temp_game)
 
     return jsonlist
+    

@@ -197,7 +197,6 @@ def GamesMenu(session_user, jsonpath):
         elif menuChoice == '8':                             # List Players
             upts_players.GetPlayers(session_user)
 
-
         else:
             print()
             print('Please choose one of the options above.')
