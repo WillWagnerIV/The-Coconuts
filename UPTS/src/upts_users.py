@@ -25,11 +25,7 @@ def AddUser(un, pw):
 
 def SignIn(un, pw):
 
-
-
-    print ('10 Starting sign in function')
-
-
+    # print ('12 Starting sign in function')
 
     # print('Trying to Validate')
     cnx = upts_db.OpenDB()
@@ -40,10 +36,8 @@ def SignIn(un, pw):
     for response in cursor:
         if response[2] == pw:
             upts_db.CloseDB(cnx)
-
-            session_user = upts_user (name = "Default First Last Name", un = un , pw = pw , uid = response[0])
+            session_user = upts_user (name = "Default User Name", un = un , pw = pw , uid = response[0])
             session_user.loginVal = "Valid"
-
             return session_user
 
         else:
@@ -66,17 +60,13 @@ def Load_games_from_db (upts_user):
     cursor.execute(sql)
     for game in cursor:
         games_idgames = game[0]
-        users_idusers = game[1]
+        upts_user.uid = game[1]
         sql = 'SELECT * FROM games WHERE idgames = "' + str(games_idgames) + '"'
         cursor.execute(sql)
         for game in cursor:
             print (game[0],game[1])
 
     upts_db.CloseDB(cnx)
-
-
-
-
 
 
 class upts_user():

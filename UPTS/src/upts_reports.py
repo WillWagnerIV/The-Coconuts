@@ -1,6 +1,6 @@
 from os import walk
 
-from upts_dbs import upts_db
+import upts_dbs
 
 # class upts_report():
 
@@ -32,7 +32,7 @@ def db_con (func):
     '''
     
     # Build
-    cnx = upts_db.OpenDB()
+    cnx = upts_dbs.OpenDB()
     cursor = cnx.cursor()
 
     # Runs the passed function or captures and returns the error
@@ -45,14 +45,14 @@ def db_con (func):
             print("Failed accessing record: {}".format(err))
 
     # Teardown    
-    upts_db.CloseDB(cnx)
+    upts_dbs.CloseDB(cnx)
 
     return inner
 
 @db_con
 def list_all_games (self):
     query = ("SELECT * FROM games")
-    upts_db.cursor.execute(query)
+    upts_dbs.cursor.execute(query)
     for (game_name) in upts_db.cursor:
         print("{}".format(game_name))
     

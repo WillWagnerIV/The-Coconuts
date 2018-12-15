@@ -1,8 +1,10 @@
 from os import walk
-# import pandas as pd
+
+import pandas as pd
 from pandas.io.json import json_normalize
 
-from upts_dbs import upts_db
+import upts_dbs as upts_db
+
 
 class upts_game():
 
@@ -55,7 +57,7 @@ class upts_game():
         print(dataframe)
         return dataframe
 
-    def save_json_pd(self):
+    def save_json_pd(self,jsonpath):
         print ('Saving game json file')
         datadict = self.convert_class_to_dict()
         pd_dataframe = self.make_Pandas(datadict)
@@ -63,24 +65,105 @@ class upts_game():
         with open(json_name, 'w') as f:
             f.write(pd_dataframe.to_json(orient='records', lines=True))
 
-    def load_json_pd(self):
-        print (self.game_name)
-        # print ('Big Chugga')
-        # print (str (jsonpath))
-        # json_name = jsonpath + self.game_name + ".json"
-        # print ('JSON NAME:')
-        # print (json_name)
-        # dataframe = pd.read_json(json_name, orient='records', lines=True)
-        # print(dataframe)
-        # return dataframe
+    def load_json_pd(self, jsonpath):
+        
+        filelist = []
+        gameslist = []
+        index = 0                                   
+        for (dirpath, dirnames, filenames) in walk(jsonpath):
+            filelist.extend(filenames)
+            
+        for filename in filelist:
+            gn = filename[:-5] 
+            temp_game = upts_game (game_name=gn)
+            print("{0}   {1}".format(index, temp_game.game_name))
+            gameslist.append(temp_game)
+            index += 1
 
-    def pfunk ():
+        file_choice = int (input ('Enter Index to Import: '))
+        filename = filelist[file_choice]
+        gamename = gameslist[file_choice]
+        print (filename)
+        print (gamename.game_name)
+        print (jsonpath)
+        
+        json_name = jsonpath + gamename.game_name + ".json"
+        print ('JSON NAME:')
+        print (json_name)
+        dataframe = pd.read_json(json_name, orient='records', lines=True)
+        
+        print ('returned dataframe')
+        print(dataframe)
+
+        # create the game then save to db
+        print ('dataframe[gamename.game_name]')
+        print (dataframe[gamename.game_name].tolist())
+
+        df_to_list = dataframe[gamename.game_name].tolist()
+
+        return dataframe
+      
+    def json_to_db(self, jsonpath, session_user):   
+        filelist = []
+        gameslist = []
+        index = 0                                   
+        for (dirpath, dirnames, filenames) in walk(jsonpath):
+            filelist.extend(filenames)
+            
+        for filename in filelist:
+            gn = filename[:-5] 
+            temp_game = upts_game (game_name=gn)
+            print("{0}   {1}".format(index, temp_game.game_name))
+            gameslist.append(temp_game)
+            index += 1
+
+        file_choice = int (input ('Enter Index to Import: '))
+        filename = filelist[file_choice]
+        gamename = gameslist[file_choice]
+        print (filename)
+        print (gamename.game_name)
+        print (jsonpath)
+        
+        json_name = jsonpath + gamename.game_name + ".json"
+        print ('JSON NAME:')
+        print (json_name)
+        dataframe = pd.read_json(json_name, orient='records', lines=True)
+        
+        print ('returned dataframe')
+        print(dataframe)
+
+        # create the game then save to db
+        print ('dataframe[gamename.game_name]')
+        print (dataframe[gamename.game_name].tolist())
+
+        df_to_list = dataframe[gamename.game_name].tolist()
+
+        # convert dataframe to class
+        game_name = df_to_list[0]['game_name']
+        game_notes = df_to_list[1]['game_notes']
+        game_currency = df_to_list[2]['game_currency']
+        game_trophies = df_to_list[3]['game_trophies']
+        game_ach = df_to_list[4]['game_ach']
+        game_items = df_to_list[5]['game_items']
+        
+        print (game_name)
+        print (game_notes)
+        print (game_currency)
+        print (game_trophies)
+        print (game_ach)
+        print (game_items)
+
+        imported_game = upts_game (game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
+
+        imported_game.save_to_db(int(session_user.uid))
+
+    def pfunk (self):
         print ('Pfunk stepped on!')
 
     def json_files (self, json_path):
         filelist = []
         for (dirpath, dirnames, filenames) in walk(json_path):
-            self.filelist.extend(filenames)
+            filelist.extend(filenames)
         return filelist
 
     # Save each property to their respective databases
@@ -91,15 +174,17 @@ class upts_game():
 
             print ('Big Test 2 Running db_con')
 
-            # Runs the passed function or captures and returns the error
-            def inner (*args, **kwargs):
+            # Build
+            cnx = upts_db.OpenDB()
+            csr = cnx.cursor()
 
-                # Build
-                upts_db.cnx = upts_db.OpenDB()
-                upts_db.csr = upts_db.cnx.cursor()
+            # Runs the passed function or captures and returns the error
+            def inner (cnx, csr, *args, **kwargs):
+
+                
         
                 # try:
-                func ( *args, **kwargs)
+                func ( cnx , csr, *args, **kwargs )
                     
                 # except Exception as err:
                 #     print("Failed accessing record: {}".format(err))
@@ -134,23 +219,23 @@ class upts_game():
 
         # Game Notes
         @db_con
-        def notes_to_db (self):
+        def notes_to_db (self, csr , cnx ):
             
             for note in self.game_notes:
                 for key in note :
-                    csr = upts_db.cnx.cursor()
+                    # csr = upts_db.cnx.cursor()
                     print ("key: %s , value: %s" % (key, note[key]))
                     sql = "INSERT INTO notes (gnote_name, gnote_details, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, note[key], self.games_idgames)
                     csr.execute(sql, val)
-                    upts_db.cnx.commit()
+                    cnx.commit()
                     
         # Currency
         @db_con
-        def cur_to_db(self):
+        def cur_to_db(self, csr, cnx):
             for cur in self.game_currency:
                 for key in cur :
-                    csr = cnx.cursor()
+                    # csr = cnx.cursor()
                     print ("key: %s , value: %s" % (key, cur[key]))
                     sql = "INSERT INTO currencies (game_currency, currency_note, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, cur[key], self.games_idgames)
@@ -159,46 +244,46 @@ class upts_game():
 
         # Trophies
         @db_con
-        def trophies_to_db(self):
+        def trophies_to_db(self, csr, cnx):
             for trophy in self.game_trophies:
                 for key in trophy:
-                    csr = upts_db.cnx.cursor()
+                    # csr = upts_db.cnx.cursor()
                     print ("key: %s , value: %s" % (key, trophy[key]))
                     sql = "INSERT INTO trophies (trophy_name, trophy_description, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, trophy[key], self.games_idgames)
                     csr.execute(self.sql, self.val)
-                    upts_db.cnx.commit()
+                    cnx.commit()
 
         # Acheivements
         @db_con
-        def ach_to_db(self):
+        def ach_to_db(self, csr, cnx):
             for achievement in self.game_ach:
                 for key in achievement:
-                    csr = upts_db.cnx.cursor()
+                    # csr = upts_db.cnx.cursor()
                     print ("key: %s , value: %s" % (key, achievement[key]))
                     sql = "INSERT INTO achievements (ach_name, ach_desc, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, achievement[key], self.games_idgames)
                     csr.execute(sql, val)
-                    upts_db.cnx.commit()
+                    cnx.commit()
 
         # Game Items
         @db_con
-        def items_to_db (self):
+        def items_to_db (self, csr, cnx):
             for item in self.game_items:
                 for key in item:
-                    csr = upts_db.cnx.cursor()
+                    # csr = upts_db.cnx.cursor()
                     print ("key: %s , value: %s, %s, %s" % (key, item[key][0], item[key][1], item[key][2]))
                     sql = "INSERT INTO items (item_name, item_desc, item_cost, cost_unit, games_idgames) VALUES (%s , %s, %s, %s, %s)"
                     val = (key, item[key][0], item[key][1], item[key][2], self.games_idgames)
                     csr.execute(sql, val)
-                    upts_db.cnx.commit()
+                    cnx.commit()
 
         # Register user with games_has_users database
         @db_con
-        def game_has_user (self, session_userid):
+        def game_has_user (self, session_userid, csr, cnx):
             print (session_userid , self.games_idgames)
             if session_userid != "None":
-                csr = upts_db.cnx.cursor()
+                # csr = upts_db.cnx.cursor()
                 try:
                     sql = "INSERT INTO games_has_users (users_idusers,games_idgames) VALUES (%s , %s)"
                     val = (session_userid , self.games_idgames)
