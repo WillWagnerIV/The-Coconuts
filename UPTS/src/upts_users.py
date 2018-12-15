@@ -22,9 +22,9 @@ def AddUser(un, pw):
 
 def SignIn(un, pw):
 
-    print ('Starting sign in function')
+    print ('2 Starting sign in function')
 
-    # print('Trying to Validate')
+    print('Trying to Validate')
     cnx = upts_db.OpenDB()
     cursor = cnx.cursor()
     sql = 'SELECT * FROM users WHERE username = "' + un + '"'
