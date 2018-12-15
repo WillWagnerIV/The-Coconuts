@@ -1,18 +1,25 @@
-import requests
-from io import StringIO
-import json
-import mysql.connector as mysql
-from mysql.connector import errorcode
-import pytest
 import datetime
-import pandas as pd
-from pandas.io.json import json_normalize
-import numpy as np
+import json
+import os
 import pprint
-import os, sys
-from os import walk
+import sys
 import time
+from io import StringIO
+from os import walk
 
+import mysql.connector as mysql
+import numpy as np
+import pandas as pd
+import pytest
+import requests
+from mysql.connector import errorcode
+from pandas.io.json import json_normalize
+
+import upts_dbs
+import upts_menus
+import upts_reports as urep
+import upts_users
+from upts_games import upts_game
 
 # #getting current file path
 path=os.path.abspath(__file__)
@@ -34,12 +41,7 @@ sys.path.append(testPath)
 sys.path.append(srcpath)
 sys.path.append(jsonpath)
 
-from upts_games import upts_game 
-from upts_dbs import upts_db
-import upts_reports as urep
-import upts_menus, upts_users
 # import upts_players, upts_reports
-
 
 # Database Connection Variables
 db_master = 'upts_s1'
@@ -105,7 +107,7 @@ class Main ():
         elif menuChoice == '1':
             upts_menus.PlayerMenu(session_user)
         elif menuChoice == '2':
-            upts_menus.GamesMenu( session_user)
+            upts_menus.GamesMenu( session_user, jsonpath)
         elif menuChoice == '3':
             upts_menus.ReportsMenu( session_user)
             

@@ -1,5 +1,7 @@
-import upts_users
-import upts_players
+import sys
+from os import walk
+
+import upts_users, upts_players, upts_games
 
 #  Login Menu
 def LoginMenu (session_user):
@@ -39,7 +41,7 @@ def LoginMenu (session_user):
 
             try:
                 session_user = upts_users.SignIn(aUser, aPass)
-                print ('Tried to sign in')
+                # print ('Tried to sign in')
                 if session_user.loginVal == "Not Valid":
                     print ('Invalid username or password')
                     # print ('none : ' + session_user.user_name)
@@ -72,10 +74,10 @@ def LoginMenu (session_user):
                 print("Oops!",sys.exc_info()[0],"occured.")
 
         elif menuChoice == '3':
-            upts_user.UserRecover()
+            upts_users.UserRecover()
 
         elif menuChoice == '4':
-            upts_user.GetUsers()
+            upts_users.GetUsers()
 
         else:
             print()
@@ -106,23 +108,27 @@ def PlayerMenu(session_user):
             break
 
         elif menuChoice == '1':                             # List Players
-            upts_player.GetPlayers(session_user.uid)
+            players = upts_players.GetPlayers(session_user)
+            for player in players:
+                print("{0}   {1}".format(player.player_id, player.player_name))
 
         elif menuChoice == '2':                             # Add a Player
             aName = input(
                 "Enter new Player Name: ")
-            upts_player.AddPlayer(session_user.uid, aName)
+            upts_players.AddPlayer(session_user.uid, aName)
 
         elif menuChoice == '3':                             # Remove a Player
             print ('Player Key | Player Information')
-            players_list = upts_player.GetPlayers(session_user.uid)
+            players = upts_players.GetPlayers(session_user)
+            for player in players:
+                print("{0}   {1}".format(player.player_id, player.player_name))
             pk = int(input ('Enter Player Key: '))
-            for player in players_list:
+            for player in players:
                 if int(pk) == player.player_id:
                     print ('Are you sure you want to remove: ' + str(player.player_name))
                     double_check = input (' Enter y to Confirm Delete - There is no reversing this action!')
                     if double_check == 'y':
-                        upts_player.removePlayer (player.player_id)
+                        upts_players.removePlayer (player.player_id)
 
         # elif menuChoice == '4':                             # Edit a Player
         #     print('Edit a Player')
@@ -133,7 +139,7 @@ def PlayerMenu(session_user):
             print()
 
 #  Games Menu
-def GamesMenu(session_user):
+def GamesMenu(session_user, jsonpath):
     GamesMenuing = True
 
     while (GamesMenuing):
@@ -157,82 +163,31 @@ def GamesMenu(session_user):
             break
 
         elif menuChoice == '1':                             # List Games
-            upts_user.Load_games_from_db(session_user)
+            upts_users.Load_games_from_db(session_user)
 
         elif menuChoice == '2':                             # list json files
 
             filelist = []
             index = 0                                   
             for (dirpath, dirnames, filenames) in walk(jsonpath):
-                filelist.extend(filenames)
-                
+                    filelist.extend(filenames)
+            
+            jsonlist = [] 
             for filename in filelist:
-                gn = filename[:-5] 
-                temp_game = upts_game (game_name=gn)
-                print("{0}   {1}".format(index, temp_game.game_name))
-                index += 1
+                # print (filename[-5:])
+                if filename[-5:] == ".json":
+                    jsonlist.append (filename)
+                    gn = filename[:-5]
+                    temp_game = upts_games.upts_game (game_name=gn)
+                    print("{0}   {1}".format(index, temp_game.game_name))
+                    index += 1
 
         elif menuChoice == '3':                             # Import json file
 
-            filelist = []
-            gameslist = []
-            index = 0                                   
-            for (dirpath, dirnames, filenames) in walk(jsonpath):
-                filelist.extend(filenames)
-                
-            for filename in filelist:
-                gn = filename[:-5] 
-                temp_game = upts_game (game_name=gn)
-                print("{0}   {1}".format(index, temp_game.game_name))
-                gameslist.append(temp_game)
-                index += 1
-
-            file_choice = int (input ('Enter Index to Import: '))
-            filename = filelist[file_choice]
-            gamename = gameslist[file_choice]
-            print (filename)
-            print (gamename.game_name)
-            print (jsonpath)
-            
-            json_name = jsonpath + gamename.game_name + ".json"
-            print ('JSON NAME:')
-            print (json_name)
-            dataframe = pd.read_json(json_name, orient='records', lines=True)
-            
-            print ('returned dataframe')
-            print(dataframe)
-
-            # create the game then save to db
-            print ('dataframe[gamename.game_name]')
-            print (dataframe[gamename.game_name].tolist())
-
-            df_to_list = dataframe[gamename.game_name].tolist()
-
-            # convert dataframe to class
-            game_name = df_to_list[0]['game_name']
-            game_notes = df_to_list[1]['game_notes']
-            print (game_notes)
-            game_currency = df_to_list[2]['game_currency']
-            game_trophies = df_to_list[3]['game_trophies']
-            game_ach = df_to_list[4]['game_ach']
-            game_items = df_to_list[5]['game_items']
-
-            # class_dict = { game_name : [
-            #             {'game_name' : game_name},
-            #             {'game_notes' : game_notes},
-            #             {'game_currency' : game_currency},
-            #             {'game_trophies' : game_trophies},
-            #             {'game_ach' : game_ach},
-            #             {'game_items' : game_items}
-            
-            
-            
-            imported_game = upts_game (game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
-
-            imported_game.save_to_db(int(session_user.uid))
+            imported_game = upts_games.load_json_pd(jsonpath)
 
         elif menuChoice == '8':                             # List Players
-            upts_player.GetPlayers(session_user.uid)
+            upts_players.GetPlayers(session_user)
 
 
         else:
@@ -285,5 +240,3 @@ def ReportsMenu(session_user):
             print()
             print('Please choose one of the options above.')
             print()
-
-
