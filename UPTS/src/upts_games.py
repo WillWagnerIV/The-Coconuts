@@ -79,14 +79,29 @@ class upts_game():
         print()
 
         # create the game then save to db
-        print ('dataframe[gamename.game_name]')
-        print (dataframe[self.game_name].tolist())
+        print ('dataframe[gamename.game_name.tolist()]')
 
         df_to_list = dataframe[self.game_name].tolist()
+        print ()
         print (df_to_list)
+        print ()
 
-        return dataframe
-      
+        # convert dataframe to class
+        self.game_name = df_to_list[0]['game_name']
+        self.game_notes = df_to_list[1]['game_notes']
+        self.game_currency = df_to_list[2]['game_currency']
+        self.game_trophies = df_to_list[3]['game_trophies']
+        self.game_ach = df_to_list[4]['game_ach']
+        self.game_items = df_to_list[5]['game_items']
+        
+        print (self.game_name)
+        print (self.game_notes)
+        print (self.game_currency)
+        print (self.game_trophies)
+        print (self.game_ach)
+        print (self.game_items)
+
+
     def json_to_db(self, jsonpath, session_user):   
         filelist = []
         gameslist = []
@@ -138,8 +153,6 @@ class upts_game():
         print (game_items)
 
         imported_game = upts_game (game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
-
-        imported_game.save_to_db(int(session_user.uid))
 
     def pfunk (self):
         print ('Pfunk stepped on!')

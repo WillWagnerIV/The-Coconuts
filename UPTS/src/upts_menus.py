@@ -185,9 +185,14 @@ def GamesMenu(session_user, jsonpath):
             
             sel = int (input ('Enter index to Import: '))
             imported_game = jsonlist[sel]
+            print ()
+            print ('Game Name:')
             print (imported_game.game_name)
-            imported_game = imported_game.load_json_pd(jsonpath)
-            print ('Imported: ' + str (imported_game.game_notes))
+            print ('imported dataframe:')
+            imported_game.load_json_pd(jsonpath)
+            print ()
+            print ('Imported: ' + str (imported_game.game_name))
+            print ()
 
         elif menuChoice == '8':                             # List Players
             upts_players.GetPlayers(session_user)
