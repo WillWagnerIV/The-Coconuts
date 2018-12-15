@@ -22,6 +22,8 @@ class upts_db():
         self.password=db_password
         self.host=db_host
         self.database=db_master
+        self.cnx = ""
+        self.csr = ""
 
     # Create Database - NOT WORKING YET - Included for Reference
     def create_database(self, cursor):
