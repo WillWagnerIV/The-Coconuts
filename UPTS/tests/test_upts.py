@@ -72,7 +72,7 @@ game_trophies = [
     {"Test Trophy Two" : "An second awesome test trophy" }
 ]
 game_ach = [
-    {"Com L1 Normal" : "Completed Level One on Normal Difficulty" },
+    {"Score " : "Completed Level One on Normal Difficulty" },
     {"Com L1 Quick" : "Completed Level One Normal Difficulty in less than 2 minutes" },
     {"Com L2 Hard" : "Completed Level Two on Hard Difficulty" }
 ]
@@ -106,22 +106,23 @@ testGame_alt_labels = {
 # Test Database Connection
 def test_upts_db():
     x = upts_db.OpenDB()
-    upts_db.CloseDB(x)
-    assert "Access denied" not in str(x)
+    assert x != None
+   # upts_db.CloseDB(x)
+    #assert "Access denied" not in str(x)
 
-# #fixture for creating Objects
-# @pytest.fixture()
-# def create_objects():
-#     a = upts_user ( user_realname, un, pw, uid )
-#     b = upts_player ( player_id, player_name)
-#     c = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
-#     return [a, b, c]
+#fixture for creating Objects
+@pytest.fixture()
+def create_objects():
+    a = upts_user ( user_realname, un, pw, uid )
+    b = upts_player ( player_id, player_name)
+    c = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
+    return [a, b, c]
 
-# #test creating objects
-# def test_creating_objects(create_objects):
-#     assert create_objects[0].name == user_realname
-#     assert create_objects[1].player_name == player_name
-#     assert create_objects[2].game_name == game_name
+#test creating objects
+def test_creating_objects(create_objects):
+    assert create_objects[0].name == user_realname
+    assert create_objects[1].player_name == player_name
+    assert create_objects[2].game_name == game_name
 
 
 
