@@ -1,6 +1,6 @@
 # UPTS - Unified Player Tracking System
 
-This is a simple POC for an internal developer system for tracking and working with player, game and user data in Python.  The application allows a developer group to input and output to and fram a MySQL database as well as reading to and from json files.  It has integrated support for Pandas and Numpy, amking it an ideal tool to work with other data science modules.
+This is a simple Proof Of Concept for an internal developer tool for tracking and working with player, game and user data in Python.  The application allows a developer group to input and output to and fram a MySQL database as well as reading to and from json files.  It has integrated support for Pandas and Numpy, making it an ideal tool to work with other data science modules.
 
 ## Getting Started
 
@@ -8,16 +8,20 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-You will need a combination of the following:
+You will need a combination of the following...
 
+Either iPython (includes Python 3.7, Pandas and Numpy)
+```
+pip install ipython
+```
+or install them individually
 ```
 pip install python3.7
 pip install pandas
 pip install numpy
-or
-pip install ipython (includes python 3.7, pandas, and numpy)
-
-
+```
+Then install the following:
+```
 pip install requests
 pip install mysql
 pip install mysql-connector
