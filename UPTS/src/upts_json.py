@@ -1,5 +1,4 @@
 from os import walk
-
 import pandas as pd
 from pandas.io.json import json_normalize
 

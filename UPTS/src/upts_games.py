@@ -14,7 +14,7 @@ class upts_game():
     allGames = []
 
     def __init__(self, game_name='none', game_notes='none', game_currency='none', game_trophies='none', game_ach='none', game_items='none'):
-        print('Initialized Game')
+        # print('Initialized Game')
         self.game_name = game_name
         self.game_notes = game_notes
         self.game_currency = game_currency
@@ -69,8 +69,8 @@ class upts_game():
     def load_json_pd(self, jsonpath):
         
         json_name = jsonpath + self.game_name + ".json"
-        print ('JSON NAME:')
-        print (json_name)
+        # print ('JSON NAME:')
+        # print (json_name)
         dataframe = pd.read_json(json_name, orient='records', lines=True)
         
         print ()
@@ -78,13 +78,13 @@ class upts_game():
         print(dataframe)
         print()
 
-        # create the game then save to db
-        print ('dataframe[gamename.game_name.tolist()]')
+        # # create the game then save to db
+        # print ('dataframe[gamename.game_name.tolist()]')
 
-        df_to_list = dataframe[self.game_name].tolist()
-        print ()
-        print (df_to_list)
-        print ()
+        # df_to_list = dataframe[self.game_name].tolist()
+        # print ()
+        # print (df_to_list)
+        # print ()
 
         # convert dataframe to class
         self.game_name = df_to_list[0]['game_name']
@@ -155,9 +155,6 @@ class upts_game():
 
         imported_game = upts_game (game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
 
-    def pfunk (self):
-        print ('Pfunk stepped on!')
-
     def json_files (self, json_path):
         filelist = []
         for (dirpath, dirnames, filenames) in walk(json_path):
@@ -173,7 +170,7 @@ class upts_game():
             # Runs the passed function or captures and returns the error
             def inner (*args, **kwargs):
 
-                print ('Setup')
+                # print ('Setup')
                 # Setup
                 self.cnx = upts_db.OpenDB()
                 self.csr = self.cnx.cursor()
@@ -185,7 +182,7 @@ class upts_game():
                 #     print("Failed accessing record: {}".format(err))
 
                 # Teardown             
-                print ('Teardown')            
+                # print ('Teardown')            
 
             return inner
 
@@ -219,7 +216,7 @@ class upts_game():
             for note in self.game_notes:
                 for key in note :
                     csr = self.cnx.cursor()
-                    print ("KEY: %s : VALUE: %s" % (key, note[key]))
+                    # print ("KEY: %s : VALUE: %s" % (key, note[key]))
                     sql = "INSERT INTO notes (gnote_name, gnote_details, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, note[key], self.games_idgames)
                     csr.execute(sql, val)
@@ -232,7 +229,7 @@ class upts_game():
             for cur in self.game_currency:
                 for key in cur :
                     csr = self.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, cur[key]))
+                    # print ("key: %s , value: %s" % (key, cur[key]))
                     sql = "INSERT INTO currencies (game_currency, currency_note, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, cur[key], self.games_idgames)
                     csr.execute(sql,val)
@@ -244,7 +241,7 @@ class upts_game():
             for trophy in self.game_trophies:
                 for key in trophy:
                     csr = self.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, trophy[key]))
+                    # print ("key: %s , value: %s" % (key, trophy[key]))
                     sql = "INSERT INTO trophies (trophy_name, trophy_description, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, trophy[key], self.games_idgames)
                     csr.execute(sql, val)
@@ -256,7 +253,7 @@ class upts_game():
             for achievement in self.game_ach:
                 for key in achievement:
                     csr = self.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, achievement[key]))
+                    # print ("key: %s , value: %s" % (key, achievement[key]))
                     sql = "INSERT INTO achievements (ach_name, ach_desc, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, achievement[key], self.games_idgames)
                     csr.execute(sql, val)
@@ -268,7 +265,7 @@ class upts_game():
             for item in self.game_items:
                 for key in item:
                     csr = self.cnx.cursor()
-                    print ("key: %s , value: %s, %s, %s" % (key, item[key][0], item[key][1], item[key][2]))
+                    # print ("key: %s , value: %s, %s, %s" % (key, item[key][0], item[key][1], item[key][2]))
                     sql = "INSERT INTO items (item_name, item_desc, item_cost, cost_unit, games_idgames) VALUES (%s , %s, %s, %s, %s)"
                     val = (key, item[key][0], item[key][1], item[key][2], self.games_idgames)
                     csr.execute(sql, val)
