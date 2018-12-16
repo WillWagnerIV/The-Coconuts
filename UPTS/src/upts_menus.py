@@ -10,6 +10,7 @@ def LoginMenu (session_user):
     #     self.session_user = session_user
     #     print (session_user.loginvalue)
 
+            
     loggingIn = True
 
     while (loggingIn):
@@ -33,6 +34,7 @@ def LoginMenu (session_user):
             return session_user
 
         elif menuChoice == '1':
+
             try:
                 aUser, aPass = input( "Enter Username and Password (Username, Password): ").split(',')
             except:
@@ -59,7 +61,6 @@ def LoginMenu (session_user):
             except:
                 pass
                 # print("Login System Oops!",sys.exc_info()[0],"occured.")
-            
 
         elif menuChoice == '2':
             try:
@@ -192,7 +193,8 @@ def GamesMenu(session_user, jsonpath):
             print ()
             print ('Game Name:')
             print (imported_game.game_name)
-            print ('imported dataframe:')
+            print ()
+            print ('Imported dataframe:')
             imported_game.load_json_pd(jsonpath)
             print ()
             print ('Imported: ' + str (imported_game.game_name))

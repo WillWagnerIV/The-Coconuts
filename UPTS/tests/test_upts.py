@@ -15,15 +15,19 @@ print ('head = ' + head)
 
 #going forward one level - add the folder name 'src'
 modulePath=os.path.join(head,'src')
+jsonpath=os.path.join(head,'json')
+
 print ('Module Path = ' + modulePath)
+print ('json Path = ' + jsonpath)
+
 
 #adding the path
 sys.path.append(modulePath)
 
 import upts_games
 import upts_dbs as upts_db
-import upts_players
-import upts_users
+import upts_json
+import upts_users, upts_players, upts_reports 
 
 # from upts_main import *
 
@@ -96,29 +100,55 @@ testGame_alt_labels = {
 # Test Database Connection
 def test_upts_db():
     x = upts_db.OpenDB()
-    assert x != None
-   # upts_db.CloseDB(x)
-    #assert "Access denied" not in str(x)
+    print (x.cursor())
+    assert str (x.cursor()) == "MySQLCursor: (Nothing executed yet)"
+    upts_db.CloseDB(x)
+    print (x.cursor())
+    assert str (x.cursor()) == "MySQLCursor: (Nothing executed yet)"
 
-#fixture for creating Objects
+# Test old-Fashioned Test
+def test_old_test():
+    upts_db.open_test_close()
+    assert 1 == 1
+
+# Fixture for creating Objects
 @pytest.fixture()
 def create_objects():
-    a = upts_users.upts_user ( user_realname, un, pw, uid )
+    a = upts_users.upts_user ( user_realname, un, pw )
+    print ('a.uid = ' + str (a.user_name))
     b = upts_players.upts_player ( player_id, player_name)
     c = upts_games.upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
     return [a, b, c]
 
-#test creating objects
+# Test creating objects
 def test_creating_objects(create_objects):
     assert create_objects[0].name == user_realname
     assert create_objects[1].player_name == player_name
     assert create_objects[2].game_name == game_name
 
+# Test Players Module
+def test_Players_module(create_objects):
 
+    uid = upts_users.AddUser(un, pw)
+    tsession_user = upts_users.upts_user ( 'Players Test Name', 'plyrtest '+un, pw )
+    tsession_user.uid = uid
 
+    print ('Session User.user_name : ' + str (tsession_user.user_name))
+    print (tsession_user.uid)
+
+    upts_players.AddPlayer ( tsession_user.uid, "Players Test Player Name" + dt)
+
+    x = upts_players.GetPlayers( tsession_user )
+    print (x)
+    assert x != []
+
+    upts_players.removePlayer(player_id)
+    x = upts_players.GetPlayers(tsession_user)
+    print (x)
+    assert x != []
 
 #parametrized tests for Adding new User to DB
-@pytest.mark.parametrize("uname",[ pytest.param(un, marks=pytest.mark.xpass(reason="Username is unique")), 
+@pytest.mark.parametrize("uname",[ pytest.param(un+"at", marks=pytest.mark.xpass(reason="Username is unique")), 
                                    pytest.param("testuser", marks=pytest.mark.xfail(reason="Username must be unique"))  ])
 def test_advanced_AddUser(uname):
     lastrowid = upts_users.AddUser(uname, pw)
@@ -147,29 +177,11 @@ def test_advanced_AddUser(uname):
 
 # Test for games report
 
+# Test reading list of json files from directory
+# Must have at least one file in directory or test should be made xfail
+def test_list_json_dir():
+    assert upts_json.list_json(jsonpath) != None
 
-
-
-# #parametrized fixture
-# @pytest.fixture(params=input_output)
-# def input_output_tuples(request):
-#     a = BankAccount()
-#     a.balance = 500
-#     return (a, request.param)
-
-# #test function utilizing parametrized fixture
-# def test_deposit_advanced(input_output_tuples):
-#     input_output_tuples[0].deposit(input_output_tuples[1][0])
-#     assert input_output_tuples[0].balance == input_output_tuples[1][1]
-
-
-# #fixture for creating Account objects
-# @pytest.fixture()
-# def create_objects():
-#     a = BankAccount("X Abc", 1234, date.today(), 500)
-#     b = CheckingAccount("X Abc", 1234, date.today(), 500)
-#     c = SavingsAccount("X Abc", 1234, date.today(), 500)
-#     return [a, b, c]
 
 # #test checking account withdraw
 # def test_checking_withdraw(create_objects):

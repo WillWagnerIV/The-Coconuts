@@ -16,12 +16,12 @@ def GetPlayers( session_user):
     return players
 
 
-def AddPlayer(un, pn):
+def AddPlayer(uid, pn):
 
     cnx = upts_db.OpenDB()
     cursor = cnx.cursor()
     sql = "INSERT INTO players (users_idusers, player_name) VALUES (%s, %s)"
-    val = (un, pn)
+    val = (uid, pn)
     cursor.execute(sql, val)
     cnx.commit()
     print("1 record inserted, ID:", cursor.lastrowid)

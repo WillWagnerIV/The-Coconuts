@@ -60,33 +60,33 @@ def CloseDB(cnx):
     # cnx.close()
     # if cnx.close() == None:
     #      print('Connection Closed')
-    return cnx
+    return
 
 # ----------  START DATABASE TABLE FUNCTIONS
 
-# Create a Table - Pass table_columns as a list
-def createTable(cnx,db_table,table_columns):
-    c = cnx.cursor()
-    colCount = 0
-    try:
-        # Create table
-        print (table_columns)
-        sqlStatement = 'CREATE TABLE '+ db_table + ' ('
-        for col_Name in table_columns:
-            sqlStatement += col_Name
-            if colCount < len (table_columns) - 1:
-                sqlStatement += ', '
-                colCount += 1
-        sqlStatement += ')'
-        print ('sql statement: ' + str(sqlStatement))
+# # Create a Table - Pass table_columns as a list
+# def createTable(cnx,db_table,table_columns):
+#     c = cnx.cursor()
+#     colCount = 0
+#     try:
+#         # Create table
+#         print (table_columns)
+#         sqlStatement = 'CREATE TABLE '+ db_table + ' ('
+#         for col_Name in table_columns:
+#             sqlStatement += col_Name
+#             if colCount < len (table_columns) - 1:
+#                 sqlStatement += ', '
+#                 colCount += 1
+#         sqlStatement += ')'
+#         print ('sql statement: ' + str(sqlStatement))
 
-        c.execute(sqlStatement)
-        cnx.commit()
-        print('created ' + db_table + ' table')
+#         c.execute(sqlStatement)
+#         cnx.commit()
+#         print('created ' + db_table + ' table')
 
-    except Exception as identifier:
-        print(str(identifier))
-        # dropTable(cnx, 'users')
+#     except Exception as identifier:
+#         print(str(identifier))
+#         # dropTable(cnx, 'users')
 
 
 
