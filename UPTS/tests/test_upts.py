@@ -15,16 +15,17 @@ print ('head = ' + head)
 
 #going forward one level - add the folder name 'src'
 modulePath=os.path.join(head,'src')
+print ('Module Path = ' + modulePath)
 
 #adding the path
 sys.path.append(modulePath)
 
-from upts_games import upts_game
-# from upts_dbs import upts_db
-# from upts_main import upts_player
-# from upts_main import upts_user
+import upts_games
+import upts_dbs as upts_db
+import upts_players
+import upts_users
 
-from upts_main import *
+# from upts_main import *
 
 
 
@@ -113,9 +114,9 @@ def test_upts_db():
 #fixture for creating Objects
 @pytest.fixture()
 def create_objects():
-    a = upts_user ( user_realname, un, pw, uid )
-    b = upts_player ( player_id, player_name)
-    c = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
+    a = upts_users.upts_user ( user_realname, un, pw, uid )
+    b = upts_players.upts_player ( player_id, player_name)
+    c = upts_games.upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
     return [a, b, c]
 
 #test creating objects
@@ -131,7 +132,7 @@ def test_creating_objects(create_objects):
 @pytest.mark.parametrize("uname",[ pytest.param(un, marks=pytest.mark.xpass(reason="Username is unique")), 
                                    pytest.param("testuser", marks=pytest.mark.xfail(reason="Username must be unique"))  ])
 def test_advanced_AddUser(uname):
-    lastrowid = upts_user.AddUser(uname, pw)
+    lastrowid = upts_users.AddUser(uname, pw)
     assert lastrowid != 0
 
 
