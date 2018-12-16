@@ -74,6 +74,7 @@ The database variables at the beginning should be customized for your database.
 ## Authors
 
 * **William Wagner** 
+* Manar Al-kayed
 
 ## License
 
