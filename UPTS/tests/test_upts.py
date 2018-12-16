@@ -39,15 +39,6 @@ import upts_users
 
 # TestGame = upts_game ( game_name, game_notes, game_currency, game_trophies, game_ach, game_items)
 
-
-
-# Database Connection Variables
-db_master = 'upts_s1'
-db_host = '134.173.236.104'
-db_user='prog_user'
-db_password='Pr0gpass'
-db_table = ""
-
 dt = time.strftime('%d/%m/%Y %H:%M:%S')
 print (dt)
 user_realname = "Test User Name" + dt
@@ -101,8 +92,6 @@ testGame_alt_labels = {
     'game_items' : game_items
     }
 }
-
-
 
 # Test Database Connection
 def test_upts_db():

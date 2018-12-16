@@ -140,6 +140,10 @@ def PlayerMenu(session_user):
 
 #  Games Menu
 def GamesMenu(session_user, jsonpath):
+
+    def __init__ (self):
+        pass
+
     GamesMenuing = True
 
     while (GamesMenuing):
@@ -149,7 +153,7 @@ def GamesMenu(session_user, jsonpath):
         print(" 1 - List All User's Games from DB")
         print(" 2 - List Contents of json directory")
         print(' 3 - Import a Game(s) from .json')
-        print(' 4 - Remove a Game from DB')
+        print(' 4 - Save Imported Game to DB')
         print(' 0 - Return to Main Menu')
         print()       
 
@@ -182,7 +186,7 @@ def GamesMenu(session_user, jsonpath):
             for jsongame in jsonlist:
                 print("{0}   {1}".format(index, jsongame.game_name ))
                 index += 1
-            
+
             sel = int (input ('Enter index to Import: '))
             imported_game = jsonlist[sel]
             print ()
@@ -192,8 +196,12 @@ def GamesMenu(session_user, jsonpath):
             imported_game.load_json_pd(jsonpath)
             print ()
             print ('Imported: ' + str (imported_game.game_name))
+            session_user.imported_game = imported_game
             print ()
 
+        elif menuChoice == '4':                             # Save Imported json file
+            session_user.imported_game.save_to_db(session_user.uid)
+            
         elif menuChoice == '8':                             # List Players
             upts_players.GetPlayers(session_user)
 

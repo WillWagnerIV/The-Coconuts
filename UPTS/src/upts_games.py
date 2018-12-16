@@ -170,25 +170,22 @@ class upts_game():
         # Use a decorator to open/close database connection
         def db_con (func):
 
-            print ('Big Test 2 Running db_con')
-
-            # Build
-            cnx = upts_db.OpenDB()
-            csr = cnx.cursor()
-
             # Runs the passed function or captures and returns the error
-            def inner (cnx, csr, *args, **kwargs):
+            def inner (*args, **kwargs):
 
-                
-        
+                print ('Setup')
+                # Setup
+                self.cnx = upts_db.OpenDB()
+                self.csr = self.cnx.cursor()
+
                 # try:
-                func ( cnx , csr, *args, **kwargs )
+                func ( *args, **kwargs )
                     
                 # except Exception as err:
                 #     print("Failed accessing record: {}".format(err))
 
-                #     # Teardown    
-                #     upts_db.CloseDB(upts_db.cnx)
+                # Teardown             
+                print ('Teardown')            
 
             return inner
 
@@ -212,81 +209,82 @@ class upts_game():
             csr.execute(self.sql)
             for (game_name) in csr:
                 self.games_idgames = game_name[0]
-            print (self.games_idgames)
+            print ('Adding ' + game_name[1] + ' with Game ID = ' + str (self.games_idgames))
             upts_db.CloseDB(cnx)
 
         # Game Notes
         @db_con
-        def notes_to_db (self, csr , cnx ):
+        def notes_to_db (self):
             
             for note in self.game_notes:
                 for key in note :
-                    # csr = upts_db.cnx.cursor()
-                    print ("key: %s , value: %s" % (key, note[key]))
+                    csr = self.cnx.cursor()
+                    print ("KEY: %s : VALUE: %s" % (key, note[key]))
                     sql = "INSERT INTO notes (gnote_name, gnote_details, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, note[key], self.games_idgames)
                     csr.execute(sql, val)
-                    cnx.commit()
+                    self.cnx.commit()
+                    
                     
         # Currency
         @db_con
-        def cur_to_db(self, csr, cnx):
+        def cur_to_db(self):
             for cur in self.game_currency:
                 for key in cur :
-                    # csr = cnx.cursor()
+                    csr = self.cnx.cursor()
                     print ("key: %s , value: %s" % (key, cur[key]))
                     sql = "INSERT INTO currencies (game_currency, currency_note, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, cur[key], self.games_idgames)
                     csr.execute(sql,val)
-                    cnx.commit()
+                    self.cnx.commit()
 
         # Trophies
         @db_con
-        def trophies_to_db(self, csr, cnx):
+        def trophies_to_db(self):
             for trophy in self.game_trophies:
                 for key in trophy:
-                    # csr = upts_db.cnx.cursor()
+                    csr = self.cnx.cursor()
                     print ("key: %s , value: %s" % (key, trophy[key]))
                     sql = "INSERT INTO trophies (trophy_name, trophy_description, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, trophy[key], self.games_idgames)
-                    csr.execute(self.sql, self.val)
-                    cnx.commit()
+                    csr.execute(sql, val)
+                    self.cnx.commit()
 
         # Acheivements
         @db_con
-        def ach_to_db(self, csr, cnx):
+        def ach_to_db(self):
             for achievement in self.game_ach:
                 for key in achievement:
-                    # csr = upts_db.cnx.cursor()
+                    csr = self.cnx.cursor()
                     print ("key: %s , value: %s" % (key, achievement[key]))
                     sql = "INSERT INTO achievements (ach_name, ach_desc, games_idgames) VALUES (%s , %s, %s)"
                     val = (key, achievement[key], self.games_idgames)
                     csr.execute(sql, val)
-                    cnx.commit()
+                    self.cnx.commit()
 
         # Game Items
         @db_con
-        def items_to_db (self, csr, cnx):
+        def items_to_db (self):
             for item in self.game_items:
                 for key in item:
-                    # csr = upts_db.cnx.cursor()
+                    csr = self.cnx.cursor()
                     print ("key: %s , value: %s, %s, %s" % (key, item[key][0], item[key][1], item[key][2]))
                     sql = "INSERT INTO items (item_name, item_desc, item_cost, cost_unit, games_idgames) VALUES (%s , %s, %s, %s, %s)"
                     val = (key, item[key][0], item[key][1], item[key][2], self.games_idgames)
                     csr.execute(sql, val)
-                    cnx.commit()
+                    self.cnx.commit()
 
         # Register user with games_has_users database
         @db_con
-        def game_has_user (self, session_userid, csr, cnx):
+        def game_has_user (self, session_userid):
             print (session_userid , self.games_idgames)
             if session_userid != "None":
-                # csr = upts_db.cnx.cursor()
+                csr = self.cnx.cursor()
                 try:
                     sql = "INSERT INTO games_has_users (users_idusers,games_idgames) VALUES (%s , %s)"
                     val = (session_userid , self.games_idgames)
-                    csr.execute(self.sql, self.val)
-                    cnx.commit()
+                    csr.execute(sql, val)
+                    self.cnx.commit()
                 except Exception as err:
                         print("Failed inserting record: {}".format(err))
 

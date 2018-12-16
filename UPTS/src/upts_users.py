@@ -59,15 +59,15 @@ def Load_games_from_db (upts_user):
     sql = 'SELECT * FROM games_has_users WHERE users_idusers = "' + str(upts_user.uid) + '"'
     cursor.execute(sql)
     for game in cursor:
+        cnx2 = upts_db.OpenDB()
+        cursor2 = cnx2.cursor()
         games_idgames = game[0]
         upts_user.uid = game[1]
         sql = 'SELECT * FROM games WHERE idgames = "' + str(games_idgames) + '"'
-        cursor.execute(sql)
-        for game in cursor:
-            print (game[0],game[1])
-
-    upts_db.CloseDB(cnx)
-
+        print ('SQL = ' + sql)
+        cursor2.execute(sql)
+        for g in cursor2:
+            print (g[0],g[1])
 
 class upts_user():
 
