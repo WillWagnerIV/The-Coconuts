@@ -31,7 +31,9 @@ pip install mysql-connector
 
 ## Installation Instructions
 
-*testPyPi erases its content without warning to create space for new test projects.*
+This project uses testPyPi for easy pip installation, however...
+
+**testPyPi erases its content without warning to create space for new test projects.**
 
 If there are any errors with testPyPi, please use the tar package instructions.
 
@@ -40,43 +42,42 @@ If there are any errors with testPyPi, please use the tar package instructions.
 You can use pip to install from TestPyPI:
 
 1.) Activate your virtual env (for example):
-    ```
-    env/bin/activate
-    ```
+```
+env/bin/activate
+```
 2.) cd to your working directory.
-    ```
-    cd path/to/awesomeness
-    ```
+```
+cd path/to/awesomeness
+```
 3.) Install with the following command:
-    ```
-    pip install --index-url https://test.pypi.org/ upts_poc
-    ```
+```
+pip install --index-url https://test.pypi.org/ upts_poc
+```
 ### tar Package Installation
 
 1.) You can download the tar or the wheel here:
 
-  <https://github.com/WillWagnerIV/The-Coconuts/tree/master/UPTS/dist>
+<https://github.com/WillWagnerIV/The-Coconuts/tree/master/UPTS/dist>
 
 2.) copy the downloaded tar to your working directory
 
 3.) cd to your working directory.
-    ```
-    cd path/to/awesomeness
-    ```
-4.) Activate your virtual env
-    ```
-    env/bin/activate
-    ```
-5.) use pip to install the archive.  The following is example code.  Please change the version to match your download.
-
 ```
-    pip install upts_poc-0.0.5-py3-none-any.whl
+cd path/to/awesomeness
+```
+4.) Activate your virtual env
+```
+env/bin/activate
+```
+5.) use pip to install the archive.  The following is example code.  Please change the version to match your download.
+```
+pip install upts_poc-0.0.5-py3-none-any.whl
 ```
 ## Alternate Installation - To work with the python files
 
 1.) You can download the tar or the wheel here:
 
-  <https://github.com/WillWagnerIV/The-Coconuts/tree/master/UPTS/dist>
+<https://github.com/WillWagnerIV/The-Coconuts/tree/master/UPTS/dist>
 
 2.) move the downloaded tar to your working directory
 
@@ -89,15 +90,14 @@ You can use pip to install from TestPyPI:
 You can test that it was installed correctly by running it from your Python interpreter.
 
 Start your Python interpreter (make sure you are still in your virtualenv if you are using one):
-
-    ```
-    ipython
-    ```
+```
+ipython
+```
 
 And then simply run *upts_main*.
-    ```
-    run upts_main.py
-    ```
+```
+run upts_main.py
+```
 ### OR - If you unpacked the .tar to edit application
 upts_main.py is located in upts_poc/src
 
