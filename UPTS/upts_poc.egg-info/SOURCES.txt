@@ -1,8 +1,5 @@
+README.md
 setup.py
-UPTS.egg-info/PKG-INFO
-UPTS.egg-info/SOURCES.txt
-UPTS.egg-info/dependency_links.txt
-UPTS.egg-info/top_level.txt
 json/__init__.py
 src/__init__.py
 src/upts_dbs.py
@@ -15,3 +12,7 @@ src/upts_reports.py
 src/upts_users.py
 tests/__init__.py
 tests/test_upts.py
+upts_poc.egg-info/PKG-INFO
+upts_poc.egg-info/SOURCES.txt
+upts_poc.egg-info/dependency_links.txt
+upts_poc.egg-info/top_level.txt
