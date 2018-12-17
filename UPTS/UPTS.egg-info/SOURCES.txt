@@ -1,0 +1,17 @@
+setup.py
+UPTS.egg-info/PKG-INFO
+UPTS.egg-info/SOURCES.txt
+UPTS.egg-info/dependency_links.txt
+UPTS.egg-info/top_level.txt
+json/__init__.py
+src/__init__.py
+src/upts_dbs.py
+src/upts_games.py
+src/upts_json.py
+src/upts_main.py
+src/upts_menus.py
+src/upts_players.py
+src/upts_reports.py
+src/upts_users.py
+tests/__init__.py
+tests/test_upts.py
