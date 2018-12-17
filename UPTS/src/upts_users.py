@@ -64,7 +64,7 @@ def Load_games_from_db (upts_user):
         games_idgames = game[0]
         upts_user.uid = game[1]
         sql = 'SELECT * FROM games WHERE idgames = "' + str(games_idgames) + '"'
-        print ('SQL = ' + sql)
+        # print ('SQL = ' + sql)
         cursor2.execute(sql)
         for g in cursor2:
             print (g[0],g[1])

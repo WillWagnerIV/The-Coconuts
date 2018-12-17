@@ -1,6 +1,6 @@
 {"Number Game":{"game_name":"Number Game"}}
-{"Number Game":{"game_notes":[{"Note 1":"A matching game with numbers."},{"Note 2":"Score goes up with more correct answers"}]}
+{"Number Game":{"game_notes":[{"Note 1":"A matching game with numbers."},{"Note 2":"Score goes up with more correct answers"}]}}
 {"Number Game":{"game_currency":[{"None":"N\/A"}]}}
-{"Number Game":{"game_trophies":[{"None":"N\/A"}]}}
-{"Number Game":{"game_ach":[{"Completed Level One on Normal Difficulty":"68"}]}
-{"Number Game":{"game_items":[{"None":"N\/A"}]}}
+{"Number Game":{"game_trophies":[{"No Trophies":"N\/A"}]}}
+{"Number Game":{"game_ach":[{"Completed Level One on Normal Difficulty":"68%"}]}}
+{"Number Game":{"game_items":[{"No Items":"N\/A"}]}}

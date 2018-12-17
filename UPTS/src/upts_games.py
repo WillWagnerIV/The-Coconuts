@@ -69,8 +69,10 @@ class upts_game():
     def load_json_pd(self, jsonpath):
         
         json_name = jsonpath + self.game_name + ".json"
-        # print ('JSON NAME:')
-        # print (json_name)
+
+        print ('JSON NAME:')
+        print (json_name)
+
         dataframe = pd.read_json(json_name, orient='records', lines=True)
         
         print ()
@@ -81,8 +83,8 @@ class upts_game():
         # # create the game then save to db
         # print ('dataframe[gamename.game_name.tolist()]')
 
-        # df_to_list = dataframe[self.game_name].tolist()
-        # print ()
+        df_to_list = dataframe[self.game_name].tolist()
+        print ()
         # print (df_to_list)
         # print ()
 

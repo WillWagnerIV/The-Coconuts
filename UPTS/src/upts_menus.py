@@ -36,7 +36,8 @@ def LoginMenu (session_user):
         elif menuChoice == '1':
 
             try:
-                aUser, aPass = input( "Enter Username and Password (Username, Password): ").split(',')
+                aUser = input( "Enter Username: ")
+                aPass = input( "Enter Password: ")
             except:
                 # print("Invalid input.  Please try again. ",sys.exc_info()[0],"occured.")
                 print("Invalid input.  Please try again. ")
@@ -153,7 +154,7 @@ def GamesMenu(session_user, jsonpath):
         print()
         print(" 1 - List All User's Games from DB")
         print(" 2 - List Contents of json directory")
-        print(' 3 - Import a Game(s) from .json')
+        print(' 3 - Import a Game from .json')
         print(' 4 - Save Imported Game to DB')
         print(' 0 - Return to Main Menu')
         print()       
@@ -220,9 +221,10 @@ def ReportsMenu(session_user):
         print()
         print('       ###   Reports Menu   ###')
         print()
-        print(" 1 - List All User's Games")
-        print(' 2 - Import a Game from .json')
-        print(' 3 - Remove a Game')
+        print (' This is where the reports and admin menus would go')
+        # print(" 1 - List All User's Games")
+        # print(' 2 - Import a Game from .json')
+        # print(' 3 - Remove a Game')
         print(' 9 - Return to Main Menu')
         print(' 0 - Quit')
         print()       
@@ -241,16 +243,16 @@ def ReportsMenu(session_user):
             session_user.loginVal = "Quit"
             break                
 
-        elif menuChoice == '1':                             # List Games
-            upts_user.Load_games_from_db(session_user)
+        # elif menuChoice == '1':                             # List Games
+        #     upts_user.Load_games_from_db(session_user)
 
-        elif menuChoice == '2':                             # Import a Game
-            upts_report.list_all_games()
-            gameID = input("Enter Game ID: ")
-            # upts_game.....
+        # elif menuChoice == '2':                             # Import a Game
+        #     upts_report.list_all_games()
+        #     gameID = input("Enter Game ID: ")
+        #     # upts_game.....
 
-        elif menuChoice == '3':                             # Remove Game
-            upts_player.GetPlayers(session_user.uid)
+        # elif menuChoice == '3':                             # Remove Game
+        #     upts_player.GetPlayers(session_user.uid)
 
 
         else:

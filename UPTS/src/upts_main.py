@@ -56,6 +56,8 @@ db_table = ""
 
 class Main ():
 
+    os.system('cls' if os.name == 'nt' else 'clear')
+    
     #  Setup Main Class Variables
     mainLooping = True
     session_user = upts_users.upts_user()
