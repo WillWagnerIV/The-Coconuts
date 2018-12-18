@@ -4,10 +4,10 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="upts_poc",
-    version="0.0.8",
+    name="upts_pypoc",
+    version="0.0.11",
     author="Will Wagner",
-    author_email="william.wagner@cgu.edu",
+    author_email="william.dot.wagner@cgu.edu",
     description="A small POC that demonstrates import/export from both databases and .json files.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -17,5 +17,5 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-    ],
+        ],
 )

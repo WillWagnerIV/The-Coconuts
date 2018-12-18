@@ -44,7 +44,7 @@ After installing the prerequisites, do one of these:
 3.) Double-Click on the tar to unpack it
 
 4.) use Python to run upts_main.py
-    upts_main.py is located in upts_poc/src
+    upts_main.py is located in upts_pypoc/src
 
 
 ### testPyPi URL installation as Python module
@@ -69,17 +69,17 @@ cd path/to/awesomeness
 ```
 3.) Install with the following command:
 ```
-pip install --index-url https://test.pypi.org/ upts_poc
+pip install --index-url https://test.pypi.org/ upts_pypoc
 ```
 
 
 ### Alternate Installation
 
-1.) You can download the tar or the wheel here:
+1.) You can download the tar and the wheel here:
 
 <https://github.com/WillWagnerIV/The-Coconuts/tree/master/UPTS/dist>
 
-2.) copy the downloaded tar to your working directory
+2.) copy the downloaded files to your working directory
 
 3.) cd to your working directory.
 ```
@@ -89,9 +89,9 @@ cd path/to/awesomeness
 ```
 env/bin/activate
 ```
-5.) use pip to install the archive.  The following is example code.  Please change the version to match your download.
+5.) use pip to install the archive.  The following is example code.  Please change the path (~/Documents/TestArea) to match your downloaded tar location.
 ```
-pip install upts_poc-0.0.5-py3-none-any.whl
+pip install --no-index ~/Documents/TestArea upts_pypoc
 ```
 
 
@@ -104,15 +104,20 @@ Start your Python interpreter (make sure you are still in your virtualenv if you
 ```
 ipython
 ```
-
-And then simply run *upts_main*.
+And then simply import *upts_pypoc*.
 ```
-run upts_main.py
+import upts_main
 ```
 
 
 ### OR - If you unpacked the .tar to edit the python files
-upts_main.py is located in ```upts_poc/src```
+
+upts_main.py is located in ```upts_pypoc/src```
+
+Simply run *upts_main*.
+```
+run upts_main.py
+```
 
 
 
@@ -124,7 +129,7 @@ pip install pytest
 pip install pytest-cov
 ```
 
-To run the accompanying tests with coverage, you can execute the following code from the UPTS folder.
+To run the accompanying tests with coverage, you can execute the following code from the upts_pypoc folder.
 ```
 pytest -s -v --cov=src tests/test_upts.py
 ```
