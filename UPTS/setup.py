@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="upts_poc",
-    version="0.0.5",
+    version="0.0.8",
     author="Will Wagner",
     author_email="william.wagner@cgu.edu",
     description="A small POC that demonstrates import/export from both databases and .json files.",

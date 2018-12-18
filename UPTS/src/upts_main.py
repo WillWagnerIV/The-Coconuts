@@ -10,7 +10,7 @@ from os import walk
 import mysql.connector as mysql
 import numpy as np
 import pandas as pd
-import pytest
+# import pytest
 import requests
 from mysql.connector import errorcode
 from pandas.io.json import json_normalize

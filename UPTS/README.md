@@ -10,26 +10,44 @@ These instructions will get you a copy of the project up and running on your loc
 
 You will need a combination of the following...
 
-Either iPython (includes Python 3.7, Pandas, Numpy and requests)
+Either iPython (includes Python 3.7, Pandas, Numpy and requests):
 ```
 pip install ipython
 ```
-or install them individually
+
+or install them individually:
 ```
 pip install python3.7
 pip install pandas
 pip install numpy
 pip install requests
+```
 
+After installing the above requirements, install the following:
 ```
-Then install the following:
-```
-pip install mysql
 pip install mysql-connector
 ```
 
 
 ## Installation Instructions
+
+After installing the prerequisites, do one of these:
+
+### tar Package Installation
+
+1.) You can download the tar or the wheel here:
+
+<https://github.com/WillWagnerIV/The-Coconuts/tree/master/UPTS/dist>
+
+2.) move the downloaded tar to your working directory
+
+3.) Double-Click on the tar to unpack it
+
+4.) use Python to run upts_main.py
+    upts_main.py is located in upts_poc/src
+
+
+### testPyPi URL installation as Python module
 
 This project uses testPyPi for easy pip installation, however...
 
@@ -37,7 +55,7 @@ This project uses testPyPi for easy pip installation, however...
 
 If there are any errors with testPyPi, please use the tar package instructions.
 
-### testPyPi Installation ( Easiest )
+### testPyPi Installation
 
 You can use pip to install from TestPyPI:
 
@@ -53,7 +71,9 @@ cd path/to/awesomeness
 ```
 pip install --index-url https://test.pypi.org/ upts_poc
 ```
-### tar Package Installation
+
+
+### Alternate Installation
 
 1.) You can download the tar or the wheel here:
 
@@ -73,19 +93,10 @@ env/bin/activate
 ```
 pip install upts_poc-0.0.5-py3-none-any.whl
 ```
-## Alternate Installation - To work with the python files
-
-1.) You can download the tar or the wheel here:
-
-<https://github.com/WillWagnerIV/The-Coconuts/tree/master/UPTS/dist>
-
-2.) move the downloaded tar to your working directory
-
-3.) Double-Click on the tar to unpack it
 
 
 
-## Test Installation
+## Test Your Installation
 
 You can test that it was installed correctly by running it from your Python interpreter.
 
@@ -98,10 +109,14 @@ And then simply run *upts_main*.
 ```
 run upts_main.py
 ```
-### OR - If you unpacked the .tar to edit application
-upts_main.py is located in upts_poc/src
 
-## Running the tests
+
+### OR - If you unpacked the .tar to edit the python files
+upts_main.py is located in ```upts_poc/src```
+
+
+
+## Running the included tests
 
 To run the tests, you will need to install pyTest and optionally pytest-coverage
 ```
