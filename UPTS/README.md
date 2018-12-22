@@ -5,8 +5,11 @@ This is a simple Proof Of Concept for an internal developer tool for tracking an
 ### User Stories
 
 -As a developer I want to be able to access the system as a single user with multiple player accounts.
+
 -As a developer I want to be able to import a game's information from a json file.
+
 -As a developer I want to be able to save a game's information to a database.
+
 
 ## Getting Started
 
