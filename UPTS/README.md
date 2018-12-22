@@ -10,13 +10,23 @@ This is a simple Proof Of Concept for an internal developer tool for tracking an
 
 -As a developer I want to be able to save a game's information to a database.
 
-### 3 Takeaways :
+### Takeaways:
 
 1.) While some things can be easily changed from an earlier prototype, core classes and functionality can be tricky to refactor later.
 
 2.) Testing is an integral part of writing good code.
 
 3.) Finding the right balance between preparation and implementation at the beginning of the project is difficult.  
+
+4.) Everything takes longer than you think, It is hard to estimate how much time a feature will take even if everything goes smoothly. But when developing the software, it is quite common to run in to unexpected problems, :)
+
+5.) A simple merge turns out to cause a subtle bug, merging codes means you have to be ready for a bug , it might not happen , but it could happen when it is unexpected. 
+
+6.) Cooperation
+Face to face has the highest bandwidth. When discussing how to solve a problem, being face to face beats video, call, chat and email , discussing problems  in person with colleagues is just the super solution for any problem
+
+Keep learning.
+software development is an ongoing learning process the more you work the more you learned.
 
 
 
