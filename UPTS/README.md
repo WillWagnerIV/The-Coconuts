@@ -4,11 +4,11 @@ This is a simple Proof Of Concept for an internal developer tool for tracking an
 
 ### User Stories
 
--As a developer I want to be able to access the system as a single user with multiple player accounts.
+-As a developer I want to be able to access the system as a single user with multiple player accounts so that I can track multiple platforms or systems..
 
--As a developer I want to be able to import a game's information from a json file.
+-As a developer I want to be able to import a game's information from a json file so that I can import from multiple games and platforms.
 
--As a developer I want to be able to save a game's information to a database.
+-As a developer I want to be able to save a game's information to a database so that I can track multiple games and platforms.
 
 ### Takeaways:
 
