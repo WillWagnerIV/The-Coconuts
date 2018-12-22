@@ -10,6 +10,15 @@ This is a simple Proof Of Concept for an internal developer tool for tracking an
 
 -As a developer I want to be able to save a game's information to a database.
 
+### 3 Takeaways :
+
+1.) While some things can be easily changed from an earlier prototype, core classes and functionality can be tricky to refactor later.
+
+2.) Testing is an integral part of writing good code.
+
+3.) Finding the right balance between preparation and implementation at the beginning of the project is difficult.  
+
+
 
 ## Getting Started
 
@@ -164,14 +173,6 @@ The database variables at the beginning should be customized for your database.
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
-
-3 Takeaways :
-
-1.) While some things can be easily changed from an earlier prototype, core classes and functionality can be tricky to refactor later.
-
-2.) Testing is an integral part of writing good code.
-
-3.) Finding the right balance between preparation and implementation at the beginning of the project is difficult.  
 
 
 * Thanks to Professor Wallace Chipidza for lots of help and knowledge
