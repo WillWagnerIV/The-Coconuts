@@ -166,9 +166,13 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Acknowledgments
 
 3 Takeaways :
+
 1.) While some things can be easily changed from an earlier prototype, core classes and functionality can be tricky to refactor later.
+
 2.) Testing is an integral part of writing good code.
+
 3.) Finding the right balance between preparation and implementation at the beginning of the project is difficult.  
+
 
 * Thanks to Professor Wallace Chipidza for lots of help and knowledge
 
