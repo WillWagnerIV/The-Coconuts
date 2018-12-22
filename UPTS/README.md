@@ -2,6 +2,12 @@
 
 This is a simple Proof Of Concept for an internal developer tool for tracking and working with player, game and user data in Python.  The application allows a developer group to input and output to and fram a MySQL database as well as reading to and from json files.  It has integrated support for Pandas and Numpy, making it an ideal tool to work with other data science modules.
 
+### User Stories
+
+As a developer I want to be able to access the system as a single user with multiple player accounts.
+As a developer I want to be able to import a game's information from a json file.
+As a developer I want to be able to save a game's information to a database.
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
@@ -155,6 +161,11 @@ The database variables at the beginning should be customized for your database.
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
+
+3 Takeaways :
+1.) While some things can be easily changed from an earlier prototype, core classes and functionality can be tricky to refactor later.
+2.) Testing is an integral part of writing good code.
+3.) Finding the right balance between preparation and implementation at the beginning of the project is difficult.  
 
 * Thanks to Professor Wallace Chipidza for lots of help and knowledge
 
