@@ -8,8 +8,8 @@ from io import StringIO
 from os import walk
 
 import mysql.connector as mysql
-import numpy as np
-import pandas as pd
+# import numpy as np
+# import pandas as pd
 import pytest
 import requests
 from mysql.connector import errorcode
