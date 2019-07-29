@@ -19,3 +19,4 @@
 # sys.path.append(testPath)
 # sys.path.append(srcpath)
 # sys.path.append(jsonpath)
+name = "upts_pypoc"
